@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="/home/corvus/workspace/nlidb4kos/lib/stanford-corenlp-full-2014-01-04/stanford-corenlp-3.3.1.jar" sourcepath="lib/stanford-corenlp-full-2014-01-04/stanford-corenlp-3.3.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/nlidb4kos/lib/stanford-corenlp-full-2014-01-04/stanford-corenlp-3.3.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/stanford-corenlp-full-2014-01-04/stanford-corenlp-3.3.1-models.jar"/>
+	<classpathentry kind="lib" path="lib/stanford-corenlp-full-2014-01-04/joda-time.jar"/>
+	<classpathentry kind="lib" path="lib/stanford-corenlp-full-2014-01-04/jollyday.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
