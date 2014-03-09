@@ -16,7 +16,6 @@ public class SyntacticAnalysisTest {
 		Properties props = new Properties();
 		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
 
-		sa = new SyntacticAnalysis(props);
 	}
 
 	@Test

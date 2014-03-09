@@ -1,10 +1,13 @@
 package cz.cvut.fel.nlidb4kos;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Properties;
 
+import stanford.SemanticAnnotator;
+import cz.cvut.fel.nlidb4kos.db.Lexicon;
 import edu.stanford.nlp.ling.CoreAnnotations.DocDateAnnotation;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
@@ -14,25 +17,10 @@ public class SyntacticAnalysis {
 
 	private final StanfordCoreNLP pipeline;
 
-	public SyntacticAnalysis(Properties properties) {
+	public SyntacticAnalysis(Properties properties, Lexicon lexicon) {
 		pipeline = new StanfordCoreNLP(properties);
 		pipeline.addAnnotator(new TimeAnnotator("sutime", properties));
-	}
-
-	/**	
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER, parsing, and coreference resolution 
-		Properties props = new Properties();
-		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
-
-		SyntacticAnalysis sa = new SyntacticAnalysis(props);
-
-		String text = "Which students attend machine learning course on tuesdays.";
-		Annotation annotation = sa.process(text);
-
-		Main.printSyntacticInfo(annotation);
+		pipeline.addAnnotator(new SemanticAnnotator("semantic", properties, lexicon));
 	}
 
 	public Annotation process(String text) {
@@ -48,5 +36,23 @@ public class SyntacticAnalysis {
 		pipeline.annotate(document);
 
 		return document;
+	}
+
+	/**	
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		// creates a StanfordCoreNLP object, with POS tagging, lemmatization, NER, parsing, and coreference resolution 
+		Properties props = new Properties();
+		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+
+		Lexicon lexicon = new Lexicon("data/schema/");
+		SyntacticAnalysis sa = new SyntacticAnalysis(props, lexicon);
+
+		String text = "Which students attend machine learning course on tuesdays.";
+		Annotation annotation = sa.process(text);
+
+		Main.printSyntacticInfo(annotation);
 	}
 }
