@@ -12,7 +12,7 @@ public class Attribute {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setType(String type) {
@@ -20,7 +20,7 @@ public class Attribute {
 	}
 
 	public String getType() {
-		return type;
+		return this.type;
 	}
 
 	public void setTokens(List<String> tokens) {
@@ -28,11 +28,11 @@ public class Attribute {
 	}
 
 	public List<String> getTokens() {
-		return tokens;
+		return this.tokens;
 	}
 
 	@Override
 	public String toString() {
-		return "myNameTokens:" + name + "," + tokens;
+		return "myNameTokens:" + this.name + "," + this.tokens;
 	}
 }

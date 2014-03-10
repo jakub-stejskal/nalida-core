@@ -9,7 +9,7 @@ public final class Schema {
 	private Map<String, Entity> schema;
 
 	public String getVersion() {
-		return version;
+		return this.version;
 	}
 
 	public void setVersion(String version) {
@@ -17,7 +17,7 @@ public final class Schema {
 	}
 
 	public Map<String, Entity> getSchema() {
-		return schema;
+		return this.schema;
 	}
 
 	public void setSchema(Map<String, Entity> users) {
@@ -26,6 +26,6 @@ public final class Schema {
 
 	@Override
 	public String toString() {
-		return new StringBuilder().append(format("Version: %s\n", version)).append(format("mySchema: %s\n", schema)).toString();
+		return new StringBuilder().append(format("Version: %s\n", this.version)).append(format("mySchema: %s\n", this.schema)).toString();
 	}
 }

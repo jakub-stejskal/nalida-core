@@ -34,9 +34,9 @@ public class Lexicon {
 	private static final String SCHEMA_FILENAME = "schema.desc";
 
 	public Lexicon(String schemaPath) throws IOException {
-		schema = loadSchema(schemaPath);
-		lemmatizer = new Lemmatizer();
-		lexicon = new HashMap<>();
+		this.schema = loadSchema(schemaPath);
+		this.lemmatizer = new Lemmatizer();
+		this.lexicon = new HashMap<>();
 		loadLexicon(schemaPath);
 	}
 
@@ -47,9 +47,9 @@ public class Lexicon {
 	}
 
 	private void loadLexicon(String schemaPath) throws IOException {
-		for (String entity : schema.getSchema().keySet()) {
-			loadEntity(entity, schema.getSchema().get(entity));
-			for (Attribute attribute : schema.getSchema().get(entity).getAttributes()) {
+		for (String entity : this.schema.getSchema().keySet()) {
+			loadEntity(entity, this.schema.getSchema().get(entity));
+			for (Attribute attribute : this.schema.getSchema().get(entity).getAttributes()) {
 				loadAttribute(entity, attribute);
 				loadValues(schemaPath, entity, attribute.getName());
 
@@ -76,7 +76,7 @@ public class Lexicon {
 		BufferedReader br = new BufferedReader(new FileReader(valueFilename));
 		String line;
 		while ((line = br.readLine()) != null) {
-			for (String token : lemmatizer.getLemmas(line)) {
+			for (String token : this.lemmatizer.getLemmas(line)) {
 				putToSemSet(token, entity + "." + attribute, ElementType.VALUE);
 			}
 		}
@@ -96,21 +96,21 @@ public class Lexicon {
 	}
 
 	private void putToSemSet(String token, String name, ElementType type) {
-		SemSet semSet = lexicon.get(token);
+		SemSet semSet = this.lexicon.get(token);
 		if (semSet == null) {
 			semSet = new SemSet();
-			lexicon.put(token, semSet);
+			this.lexicon.put(token, semSet);
 		}
 		semSet.add(Pair.makePair(type, name));
 	}
 
 	public SemSet getSemSet(String lemma) {
-		return lexicon.get(lemma.toLowerCase());
+		return this.lexicon.get(lemma.toLowerCase());
 	}
 
 	@Override
 	public String toString() {
-		return "schema: \n" + schema + "\nlexicon: \n" + lexicon;
+		return "schema: \n" + this.schema + "\nlexicon: \n" + this.lexicon;
 	}
 
 	public static void main(String[] args) throws Exception {

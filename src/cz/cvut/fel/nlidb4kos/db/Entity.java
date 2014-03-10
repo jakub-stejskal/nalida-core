@@ -11,7 +11,7 @@ public class Entity {
 	}
 
 	public List<Attribute> getAttributes() {
-		return attributes;
+		return this.attributes;
 	}
 
 	public void setSubresources(List<Attribute> subresources) {
@@ -19,11 +19,11 @@ public class Entity {
 	}
 
 	public List<Attribute> getSubresources() {
-		return subresources;
+		return this.subresources;
 	}
 
 	@Override
 	public String toString() {
-		return "myAttr:" + attributes.toString() + ", mySubRes:" + attributes.toString();
+		return "myAttr:" + this.attributes.toString() + ", mySubRes:" + this.attributes.toString();
 	}
 }

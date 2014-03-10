@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Properties;
 
-import stanford.SemanticAnnotator;
 import cz.cvut.fel.nlidb4kos.db.Lexicon;
+import cz.cvut.fel.nlidb4kos.stanford.SemanticAnnotator;
 import edu.stanford.nlp.ling.CoreAnnotations.DocDateAnnotation;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
@@ -18,9 +18,9 @@ public class SyntacticAnalysis {
 	private final StanfordCoreNLP pipeline;
 
 	public SyntacticAnalysis(Properties properties, Lexicon lexicon) {
-		pipeline = new StanfordCoreNLP(properties);
-		pipeline.addAnnotator(new TimeAnnotator("sutime", properties));
-		pipeline.addAnnotator(new SemanticAnnotator("semantic", properties, lexicon));
+		this.pipeline = new StanfordCoreNLP(properties);
+		this.pipeline.addAnnotator(new TimeAnnotator("sutime", properties));
+		this.pipeline.addAnnotator(new SemanticAnnotator("semantic", properties, lexicon));
 	}
 
 	public Annotation process(String text) {
@@ -33,7 +33,7 @@ public class SyntacticAnalysis {
 		document.set(DocDateAnnotation.class, date);
 
 		// run all Annotators on this text
-		pipeline.annotate(document);
+		this.pipeline.annotate(document);
 
 		return document;
 	}

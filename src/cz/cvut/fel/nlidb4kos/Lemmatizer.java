@@ -17,13 +17,13 @@ public class Lemmatizer {
 		Properties props = new Properties();
 		props.put("annotators", "tokenize, ssplit, pos, lemma");
 
-		pipeline = new StanfordCoreNLP(props);
+		this.pipeline = new StanfordCoreNLP(props);
 	}
 
 	public List<String> getLemmas(String text) {
 		Annotation document = new Annotation(text);
 
-		pipeline.annotate(document);
+		this.pipeline.annotate(document);
 
 		List<String> lemmas = new ArrayList<>();
 		for (CoreLabel token : document.get(TokensAnnotation.class)) {
