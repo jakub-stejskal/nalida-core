@@ -10,7 +10,6 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import cz.cvut.fel.nlidb4kos.db.Lexicon;
-import cz.cvut.fel.nlidb4kos.db.Lexicon.ElementType;
 import cz.cvut.fel.nlidb4kos.db.Lexicon.SemSet;
 import cz.cvut.fel.nlidb4kos.stanford.SemanticAnnotator;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
@@ -22,7 +21,6 @@ import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation;
 import edu.stanford.nlp.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Pair;
 
 public class SemanticAnalysis {
 
@@ -54,8 +52,8 @@ public class SemanticAnalysis {
 			if (semSet != null) {
 				tokenIndices.put(Integer.valueOf(index), Integer.valueOf(position++));
 				Set<Token> tokenSet = new HashSet<>();
-				for (Pair<ElementType, String> pair : semSet) {
-					tokenSet.add(new Token(Sets.newHashSet(token.word()), pair.first, pair.second));
+				for (Token t : semSet) {
+					tokenSet.add(new Token(Sets.newHashSet(token.word()), t));
 				}
 				tokenSets.add(tokenSet);
 			}
@@ -68,13 +66,13 @@ public class SemanticAnalysis {
 		CoreMap sentence = annotatedLine.get(SentencesAnnotation.class).get(0);
 		SemanticGraph dependencyTree = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
 
-		Set<Pair<Integer, Integer>> attachmentsTemplate = new HashSet<>();
+		Set<Attachment<Integer>> attachmentsTemplate = new HashSet<>();
 		for (SemanticGraphEdge edge : dependencyTree.getEdgeSet()) {
 			Integer sourceIndex = tokenIndices.get(Integer.valueOf(edge.getSource().index()));
 			Integer targetIndex = tokenIndices.get(Integer.valueOf(edge.getTarget().index()));
 
 			if (sourceIndex != null && targetIndex != null) {
-				Pair<Integer, Integer> attachment = Pair.makePair(sourceIndex, targetIndex);
+				Attachment<Integer> attachment = new Attachment<>(sourceIndex, targetIndex, edge.getRelation().getShortName());
 				attachmentsTemplate.add(attachment);
 			}
 		}

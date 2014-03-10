@@ -9,6 +9,14 @@ public class Token {
 	protected ElementType entityType;
 	protected String entityName;
 
+	public Token(ElementType entityType, String entityName) {
+		this(null, entityType, entityName);
+	}
+
+	public Token(Set<String> words, Token token) {
+		this(words, token.entityType, token.entityName);
+	}
+
 	public Token(Set<String> words, ElementType entityType, String entityName) {
 		super();
 		this.words = words;

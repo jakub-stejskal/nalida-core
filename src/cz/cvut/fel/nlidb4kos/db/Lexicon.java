@@ -10,13 +10,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
 
 import cz.cvut.fel.nlidb4kos.Lemmatizer;
-import edu.stanford.nlp.util.ArraySet;
-import edu.stanford.nlp.util.Pair;
+import cz.cvut.fel.nlidb4kos.Token;
 
 public class Lexicon {
 
@@ -24,7 +24,8 @@ public class Lexicon {
 	Map<String, SemSet> lexicon;
 	Lemmatizer lemmatizer;
 
-	public class SemSet extends ArraySet<Pair<ElementType, String>> {
+	public class SemSet extends HashSet<Token> {
+		private static final long serialVersionUID = 1L;
 	}
 
 	public enum ElementType {
@@ -101,7 +102,7 @@ public class Lexicon {
 			semSet = new SemSet();
 			this.lexicon.put(token, semSet);
 		}
-		semSet.add(Pair.makePair(type, name));
+		semSet.add(new Token(type, name));
 	}
 
 	public SemSet getSemSet(String lemma) {

@@ -9,27 +9,28 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
 import cz.cvut.fel.nlidb4kos.db.Lexicon.ElementType;
-import edu.stanford.nlp.util.Pair;
 
 public class Tokenization {
-	final protected Set<Pair<Token, Token>> attachments;
+	final protected Set<Attachment<Token>> attachments;
 	final protected List<Token> tokens;
 
-	public Tokenization(List<Token> tokenList, Set<Pair<Integer, Integer>> attachmentsTemplate) {
+	public Tokenization(List<Token> tokenList, Set<Attachment<Integer>> attachmentsTemplate) {
 		this.tokens = tokenList;
 		this.attachments = createAttachments(attachmentsTemplate);
 	}
 
-	private Set<Pair<Token, Token>> createAttachments(Set<Pair<Integer, Integer>> attachmentsTemplate) {
-		Set<Pair<Token, Token>> atts = new HashSet<>();
+	private Set<Attachment<Token>> createAttachments(Set<Attachment<Integer>> attachmentsTemplate) {
+		Set<Attachment<Token>> atts = new HashSet<>();
 
-		for (Pair<Integer, Integer> pair : attachmentsTemplate) {
-			atts.add(Pair.makePair(this.tokens.get(pair.first.intValue()), this.tokens.get(pair.second.intValue())));
+		for (Attachment<Integer> attachment : attachmentsTemplate) {
+			Token source = this.tokens.get(attachment.source.intValue());
+			Token target = this.tokens.get(attachment.target.intValue());
+			atts.add(new Attachment<Token>(source, target, attachment.type));
 		}
 		return atts;
 	}
 
-	public Set<Pair<Token, Token>> getAttachments() {
+	public Set<Attachment<Token>> getAttachments() {
 		return this.attachments;
 	}
 
@@ -48,11 +49,11 @@ public class Tokenization {
 
 	public Set<Token> getAttached(Token token) {
 		Set<Token> attached = new HashSet<>();
-		for (Pair<Token, Token> edge : this.attachments) {
-			if (edge.first.equals(token)) {
-				attached.add(edge.second);
-			} else if (edge.second.equals(token)) {
-				attached.add(edge.first);
+		for (Attachment<Token> edge : this.attachments) {
+			if (edge.source.equals(token)) {
+				attached.add(edge.target);
+			} else if (edge.target.equals(token)) {
+				attached.add(edge.source);
 			}
 		}
 		return attached;
