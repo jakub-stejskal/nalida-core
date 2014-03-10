@@ -1,4 +1,4 @@
-package stanford;
+package cz.cvut.fel.nlidb4kos.stanford;
 
 import java.io.IOException;
 import java.util.Collections;

@@ -1,12 +1,16 @@
 package cz.cvut.fel.nlidb4kos.db;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 public class QueryBuilder {
 	private static final String PARAM_START = "?";
@@ -28,36 +32,42 @@ public class QueryBuilder {
 	}
 
 	public QueryBuilder projection(String... attributes) {
-		projection.addAll(Arrays.asList(attributes));
+		this.projection.addAll(Arrays.asList(attributes));
 		return this;
 	}
 
-	public QueryBuilder constraint(String attribute, String operator, String value) {
-		constraints.put(attribute, operator + value);
+	public QueryBuilder constraint(String attribute, String operator, String... values) {
+		String concatValue = "*" + Joiner.on("*").join(values) + "*";
+		this.constraints.put(attribute, operator + concatValue.toString());
 		return this;
 	}
 
 	public String build() {
-		return baseUrl + resource + PARAM_START + constraintsToString() + PARAM_DELIM + projectionToString();
+		List<String> params = new ArrayList<>();
+		for (String param : Lists.newArrayList(projectionParam(), constraintsParam(), defaultParams())) {
+			if (param != null) {
+				params.add(param);
+			}
+		}
+
+		return this.baseUrl + this.resource + PARAM_START + Joiner.on(PARAM_DELIM).join(params);
 	}
 
-	private String projectionToString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("fields=");
-		for (String p : projection) {
-			sb.append(p);
-			sb.append(",");
-		}
-		return sb.toString();
+	private String defaultParams() {
+		return "lang=en&multilang=false&limit=100&sem=current,next";
 	}
 
-	private String constraintsToString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("query=");
-		for (Entry<String, String> c : constraints.entrySet()) {
-			sb.append(c.getKey() + c.getValue());
-			sb.append(";");
+	private String projectionParam() {
+		if (this.projection.isEmpty()) {
+			return null;
 		}
-		return sb.toString();
+		return "fields=entry(" + Joiner.on(",").skipNulls().join(this.projection) + ")";
+	}
+
+	private String constraintsParam() {
+		if (this.constraints.isEmpty()) {
+			return null;
+		}
+		return "query=" + Joiner.on(";").withKeyValueSeparator("").join(this.constraints);
 	}
 }
