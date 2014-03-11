@@ -15,6 +15,7 @@ import cz.cvut.fel.nlidb4kos.db.Schema;
 
 public class QueryGenerator {
 
+	@SuppressWarnings("unused")
 	private final Schema schema;
 	private final URL baseUrl;
 
@@ -23,11 +24,18 @@ public class QueryGenerator {
 		this.baseUrl = baseUrl;
 	}
 
-	String generateQuery(Tokenization tokenization) {
+	public String generateQuery(Tokenization tokenization) {
 		Set<Token> projections = getProjectionElements(tokenization);
 		Set<Token> entities = getEntityElements(tokenization);
 		Set<Token> constraints = getConstraintElements(tokenization);
-		return createQuery(projections, entities, constraints);
+		return fillQuery(projections, entities, constraints).build();
+	}
+
+	public String prettyPrintQuery(Tokenization tokenization) {
+		Set<Token> projections = getProjectionElements(tokenization);
+		Set<Token> entities = getEntityElements(tokenization);
+		Set<Token> constraints = getConstraintElements(tokenization);
+		return fillQuery(projections, entities, constraints).toString();
 	}
 
 	private Set<Token> getProjectionElements(Tokenization tokenization) {
@@ -51,10 +59,10 @@ public class QueryGenerator {
 		return new HashSet<>(tokenization.getTokens(ElementType.VALUE));
 	}
 
-	private String createQuery(Set<Token> projections, Set<Token> entities, Set<Token> constraints) {
+	private QueryBuilder fillQuery(Set<Token> projections, Set<Token> entities, Set<Token> constraints) {
 		QueryBuilder qb = new QueryBuilder(this.baseUrl);
 
-		qb.projection("title");
+		qb.projection("title", "link");
 		for (Token token : projections) {
 			qb.projection(getProjectionLabel(token, getResourceName(entities)));
 		}
@@ -68,7 +76,7 @@ public class QueryGenerator {
 		for (Token token : constraints) {
 			qb.constraint(getConstraintLabel(token, getResourceName(entities)), "==", Iterables.toArray(token.getWords(), String.class));
 		}
-		return qb.build();
+		return qb;
 	}
 
 	private String getProjectionLabel(Token token, String resourceName) {

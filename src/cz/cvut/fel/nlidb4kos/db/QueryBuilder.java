@@ -44,17 +44,24 @@ public class QueryBuilder {
 
 	public String build() {
 		List<String> params = new ArrayList<>();
-		for (String param : Lists.newArrayList(projectionParam(), constraintsParam(), defaultParams())) {
-			if (param != null) {
-				params.add(param);
-			}
-		}
+		params.add(projectionParam());
+		params.add(constraintsParam());
+		params.addAll(defaultParams());
 
-		return this.baseUrl + this.resource + PARAM_START + Joiner.on(PARAM_DELIM).join(params);
+		return this.baseUrl + this.resource + PARAM_START + Joiner.on(PARAM_DELIM).skipNulls().join(params);
 	}
 
-	private String defaultParams() {
-		return "lang=en&multilang=false&limit=100&sem=current,next";
+	@Override
+	public String toString() {
+		List<String> params = new ArrayList<>();
+		params.add(projectionParam());
+		params.add(constraintsParam());
+		return "/" + this.resource + "\n" + PARAM_START + Joiner.on("\n" + PARAM_DELIM).skipNulls().join(params);
+
+	}
+
+	private List<String> defaultParams() {
+		return Lists.newArrayList("lang=en", "multilang=false", "limit=100", "sem=current,next");
 	}
 
 	private String projectionParam() {

@@ -84,10 +84,4 @@ public class SemanticAnalysis {
 
 		return tokenizations;
 	}
-
-	public void getDependencies(Annotation annotatedLine) {
-		SemanticGraph dependencies = annotatedLine.get(CollapsedCCProcessedDependenciesAnnotation.class);
-		System.out.println("dependencies: \n" + dependencies);
-	}
-
 }

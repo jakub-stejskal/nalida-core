@@ -20,7 +20,6 @@ public class SemanticAnnotator implements Annotator, CoreAnnotation<Lexicon.SemS
 	public static final String SCHEMA_PATH = "semantic-path";
 	public static final Requirement SEMSET_REQUIREMENT = new Requirement(ANNOTATOR_CLASS);
 
-	private final Properties props;
 	private final Lexicon lexicon;
 
 	public SemanticAnnotator(String annotatorClass, Properties props) throws IOException {
@@ -28,7 +27,6 @@ public class SemanticAnnotator implements Annotator, CoreAnnotation<Lexicon.SemS
 	}
 
 	public SemanticAnnotator(String annotatorClass, Properties props, Lexicon lexicon) {
-		this.props = props;
 		this.lexicon = lexicon;
 	}
 
@@ -48,7 +46,7 @@ public class SemanticAnnotator implements Annotator, CoreAnnotation<Lexicon.SemS
 			List<CoreLabel> tokens = annotation.get(TokensAnnotation.class);
 			for (CoreLabel token : tokens) {
 				String lemma = token.lemma();
-				token.set(SemanticAnnotator.class, lexicon.getSemSet(lemma));
+				token.set(SemanticAnnotator.class, this.lexicon.getSemSet(lemma));
 			}
 		}
 

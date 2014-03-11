@@ -22,26 +22,18 @@ public class Main {
 	private static final String QUERIES_FILE = "data/queries2.txt";
 	static Scanner in = new Scanner(System.in);
 
+	private static SyntacticAnalysis syntacticAnalysis;
+	private static SemanticAnalysis semanticAnalysis;
+	private static QueryGenerator queryGenerator;
+	private static Lexicon lexicon;
+
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
 
-		Properties properties = new Properties();
-		properties.load(Main.class.getClassLoader().getResourceAsStream("nlpcore.properties"));
-
-		Lexicon lexicon = new Lexicon("data/schema/");
-
-		System.out.println(lexicon);
-
-		SyntacticAnalysis syntacticAnalysis = new SyntacticAnalysis(properties, lexicon);
-		SemanticAnalysis semanticAnalysis = new SemanticAnalysis(lexicon);
-
-		Properties props = new Properties();
-		props.load(Main.class.getClassLoader().getResourceAsStream("db.properties"));
-
-		QueryGenerator queryGenerator = new QueryGenerator(null, new URL(props.getProperty("baseUrl")));
+		initializeModules();
 
 		File file = new File(QUERIES_FILE);
 		BufferedReader br = new BufferedReader(new FileReader(file));
@@ -49,17 +41,38 @@ public class Main {
 
 		while ((line = br.readLine()) != null) {
 			System.out.println("\n XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
+			System.out.println(line);
+
 			Annotation annotatedLine = syntacticAnalysis.process(line);
-			printSyntacticInfo(annotatedLine);
+			//			printSyntacticInfo(annotatedLine);
 			Set<Tokenization> tokenizations = semanticAnalysis.getTokenizations(annotatedLine);
 			//			printSemanticInfo(tokenizations);
 			Tokenization tokenization = pickTokenization(tokenizations);
 
 			System.out.println("Generated query:");
 			System.out.println(queryGenerator.generateQuery(tokenization));
+			System.out.println();
+			System.out.println("Prettified query:");
+			System.out.println(queryGenerator.prettyPrintQuery(tokenization));
 		}
 		br.close();
 		in.close();
+	}
+
+	private static void initializeModules() throws IOException {
+		Properties properties = new Properties();
+		properties.load(Main.class.getClassLoader().getResourceAsStream("nlpcore.properties"));
+
+		lexicon = new Lexicon("data/schema/");
+
+		syntacticAnalysis = new SyntacticAnalysis(properties, lexicon);
+		semanticAnalysis = new SemanticAnalysis(lexicon);
+
+		Properties props = new Properties();
+		props.load(Main.class.getClassLoader().getResourceAsStream("db.properties"));
+
+		queryGenerator = new QueryGenerator(null, new URL(props.getProperty("baseUrl")));
+
 	}
 
 	private static Tokenization pickTokenization(Set<Tokenization> tokenizations) throws IOException {
