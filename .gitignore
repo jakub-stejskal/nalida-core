@@ -6,5 +6,8 @@
 *.ear
 
 /bin
-/lib
+/target
 /data
+
+/.project
+/.settings
