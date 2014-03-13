@@ -1,4 +1,4 @@
-package cz.cvut.fel.nlidb4kos.db;
+package cz.cvut.fel.nalida.db;
 
 import static java.lang.String.format;
 

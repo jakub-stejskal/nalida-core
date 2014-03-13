@@ -1,4 +1,4 @@
-package cz.cvut.fel.nlidb4kos;
+package cz.cvut.fel.nalida;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,9 +9,9 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
-import cz.cvut.fel.nlidb4kos.db.Lexicon;
-import cz.cvut.fel.nlidb4kos.db.Lexicon.SemSet;
-import cz.cvut.fel.nlidb4kos.stanford.SemanticAnnotator;
+import cz.cvut.fel.nalida.db.Lexicon;
+import cz.cvut.fel.nalida.db.Lexicon.SemSet;
+import cz.cvut.fel.nalida.stanford.SemanticAnnotator;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;

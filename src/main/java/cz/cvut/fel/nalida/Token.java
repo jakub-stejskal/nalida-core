@@ -1,8 +1,8 @@
-package cz.cvut.fel.nlidb4kos;
+package cz.cvut.fel.nalida;
 
 import java.util.Set;
 
-import cz.cvut.fel.nlidb4kos.db.Lexicon.ElementType;
+import cz.cvut.fel.nalida.db.Lexicon.ElementType;
 
 public class Token {
 	protected Set<String> words;

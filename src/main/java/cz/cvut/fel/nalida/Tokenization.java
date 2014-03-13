@@ -1,4 +1,4 @@
-package cz.cvut.fel.nlidb4kos;
+package cz.cvut.fel.nalida;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -8,7 +8,7 @@ import java.util.Set;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
-import cz.cvut.fel.nlidb4kos.db.Lexicon.ElementType;
+import cz.cvut.fel.nalida.db.Lexicon.ElementType;
 
 public class Tokenization {
 	final protected Set<Attachment<Token>> attachments;

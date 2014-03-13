@@ -1,4 +1,4 @@
-package cz.cvut.fel.nlidb4kos.stanford;
+package cz.cvut.fel.nalida.stanford;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import cz.cvut.fel.nlidb4kos.db.Lexicon;
-import cz.cvut.fel.nlidb4kos.db.Lexicon.SemSet;
+import cz.cvut.fel.nalida.db.Lexicon;
+import cz.cvut.fel.nalida.db.Lexicon.SemSet;
 import edu.stanford.nlp.ling.CoreAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;

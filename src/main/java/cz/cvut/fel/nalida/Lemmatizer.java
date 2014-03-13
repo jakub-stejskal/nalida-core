@@ -1,4 +1,4 @@
-package cz.cvut.fel.nlidb4kos;
+package cz.cvut.fel.nalida;
 
 import java.util.ArrayList;
 import java.util.List;

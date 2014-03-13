@@ -1,4 +1,4 @@
-package cz.cvut.fel.nlidb4kos;
+package cz.cvut.fel.nalida;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,9 +9,9 @@ import java.util.Set;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
-import cz.cvut.fel.nlidb4kos.db.Lexicon.ElementType;
-import cz.cvut.fel.nlidb4kos.db.QueryBuilder;
-import cz.cvut.fel.nlidb4kos.db.Schema;
+import cz.cvut.fel.nalida.db.QueryBuilder;
+import cz.cvut.fel.nalida.db.Schema;
+import cz.cvut.fel.nalida.db.Lexicon.ElementType;
 
 public class QueryGenerator {
 

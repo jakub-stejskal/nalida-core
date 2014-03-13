@@ -1,4 +1,4 @@
-package cz.cvut.fel.nlidb4kos.db;
+package cz.cvut.fel.nalida.db;
 
 import static java.lang.String.format;
 
@@ -15,8 +15,8 @@ import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
 
-import cz.cvut.fel.nlidb4kos.Lemmatizer;
-import cz.cvut.fel.nlidb4kos.Token;
+import cz.cvut.fel.nalida.Lemmatizer;
+import cz.cvut.fel.nalida.Token;
 
 public class Lexicon {
 

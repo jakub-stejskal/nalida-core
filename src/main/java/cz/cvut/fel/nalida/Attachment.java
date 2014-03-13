@@ -1,4 +1,4 @@
-package cz.cvut.fel.nlidb4kos;
+package cz.cvut.fel.nalida;
 
 public class Attachment<T> {
 	T source;

@@ -1,4 +1,4 @@
-package cz.cvut.fel.nlidb4kos.db;
+package cz.cvut.fel.nalida.db;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package cz.cvut.fel.nlidb4kos;
+package cz.cvut.fel.nalida;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Properties;
 
-import cz.cvut.fel.nlidb4kos.db.Lexicon;
-import cz.cvut.fel.nlidb4kos.stanford.SemanticAnnotator;
+import cz.cvut.fel.nalida.db.Lexicon;
+import cz.cvut.fel.nalida.stanford.SemanticAnnotator;
 import edu.stanford.nlp.ling.CoreAnnotations.DocDateAnnotation;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;

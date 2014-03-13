@@ -1,4 +1,4 @@
-package cz.cvut.fel.nlidb4kos;
+package cz.cvut.fel.nalida;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,7 +11,7 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
 
-import cz.cvut.fel.nlidb4kos.db.Lexicon;
+import cz.cvut.fel.nalida.db.Lexicon;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.pipeline.Annotation;
