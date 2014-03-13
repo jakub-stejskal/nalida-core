@@ -1,4 +1,4 @@
-nlidb4kos
+NaLIDA
 =========
 
-Natural Language Interface to Database of Study information system at FEE CTU
+Natural Language Interface to DAtabase of Study information system KOS at FEE CTU
