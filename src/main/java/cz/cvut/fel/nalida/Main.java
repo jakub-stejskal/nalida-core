@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -12,6 +11,8 @@ import java.util.Scanner;
 import java.util.Set;
 
 import cz.cvut.fel.nalida.db.Lexicon;
+import cz.cvut.fel.nalida.db.Query;
+import cz.cvut.fel.nalida.db.XmlParser;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -54,6 +55,15 @@ public class Main {
 			System.out.println();
 			System.out.println("Prettified query:");
 			System.out.println(queryGenerator.prettyPrintQuery(tokenization));
+
+			Query query = queryGenerator.generateQuery(tokenization);
+			System.out.println(query.toString());
+			System.out.println();
+			try {
+				System.out.println(new XmlParser().format(query.getResponse()));
+			} catch (Exception e) {
+				System.out.println(e);
+			}
 		}
 		br.close();
 		in.close();
@@ -71,7 +81,7 @@ public class Main {
 		Properties props = new Properties();
 		props.load(Main.class.getClassLoader().getResourceAsStream("db.properties"));
 
-		queryGenerator = new QueryGenerator(null, new URL(props.getProperty("baseUrl")));
+		queryGenerator = new QueryGenerator(null, props);
 
 	}
 

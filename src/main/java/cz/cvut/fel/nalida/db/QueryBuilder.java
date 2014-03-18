@@ -1,27 +1,42 @@
 package cz.cvut.fel.nalida.db;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class QueryBuilder {
 	private static final String PARAM_START = "?";
 	private static final String PARAM_DELIM = "&";
-	protected URL baseUrl;
 	protected String resource;
 	protected Set<String> projection;
 	protected Map<String, String> constraints;
+	private final WebResource webResource;
 
-	public QueryBuilder(URL baseURL) {
-		this.baseUrl = baseURL;
+	public QueryBuilder(Properties properties) {
+
+		String baseUrl = properties.getProperty("baseUrl");
+		String user = properties.getProperty("auth.user");
+		String password = properties.getProperty("auth.password");
+
+		Client client = Client.create();
+		client.addFilter(new HTTPBasicAuthFilter(user, password));
+
+		this.webResource = client.resource(baseUrl);
+
 		this.projection = new HashSet<>();
 		this.constraints = new HashMap<>();
 	}
@@ -42,13 +57,19 @@ public class QueryBuilder {
 		return this;
 	}
 
-	public String build() {
-		List<String> params = new ArrayList<>();
-		params.add(projectionParam());
-		params.add(constraintsParam());
-		params.addAll(defaultParams());
+	public Query build() {
+		MultivaluedMap<String, String> params = new MultivaluedMapImpl();
 
-		return this.baseUrl + this.resource + PARAM_START + Joiner.on(PARAM_DELIM).skipNulls().join(params);
+		String proj = projectionParam();
+		if (proj != null)
+			params.add("fields", proj);
+		String constr = constraintsParam();
+		if (constr != null)
+			params.add("query", constr);
+		params.putAll(defaultParams());
+
+		return new Query(this.webResource.path(this.resource).queryParams(params));
+		//		return this.baseUrl + this.resource + PARAM_START + Joiner.on(PARAM_DELIM).skipNulls().join(params);
 	}
 
 	@Override
@@ -60,21 +81,26 @@ public class QueryBuilder {
 
 	}
 
-	private List<String> defaultParams() {
-		return Lists.newArrayList("lang=en", "multilang=false", "limit=100", "sem=current,next");
+	private Map<String, List<String>> defaultParams() {
+		Map<String, List<String>> m = new HashMap<>();
+		m.put("lang", Lists.newArrayList("en"));
+		m.put("multilang", Lists.newArrayList("false"));
+		m.put("limit", Lists.newArrayList("100"));
+		m.put("sem", Lists.newArrayList("current", "next"));
+		return m;
 	}
 
 	private String projectionParam() {
 		if (this.projection.isEmpty()) {
 			return null;
 		}
-		return "fields=entry(" + Joiner.on(",").skipNulls().join(this.projection) + ")";
+		return "entry(" + Joiner.on(",").skipNulls().join(this.projection) + ")";
 	}
 
 	private String constraintsParam() {
 		if (this.constraints.isEmpty()) {
 			return null;
 		}
-		return "query=" + Joiner.on(";").withKeyValueSeparator("").join(this.constraints);
+		return Joiner.on(";").withKeyValueSeparator("").join(this.constraints);
 	}
 }

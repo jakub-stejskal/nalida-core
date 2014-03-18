@@ -2,29 +2,30 @@ package cz.cvut.fel.nalida;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
+import cz.cvut.fel.nalida.db.Lexicon.ElementType;
+import cz.cvut.fel.nalida.db.Query;
 import cz.cvut.fel.nalida.db.QueryBuilder;
 import cz.cvut.fel.nalida.db.Schema;
-import cz.cvut.fel.nalida.db.Lexicon.ElementType;
 
 public class QueryGenerator {
 
 	@SuppressWarnings("unused")
 	private final Schema schema;
-	private final URL baseUrl;
+	private final Properties props;
 
-	public QueryGenerator(Schema schema, URL baseUrl) throws FileNotFoundException, IOException {
+	public QueryGenerator(Schema schema, Properties props) throws FileNotFoundException, IOException {
 		this.schema = schema;
-		this.baseUrl = baseUrl;
+		this.props = props;
 	}
 
-	public String generateQuery(Tokenization tokenization) {
+	public Query generateQuery(Tokenization tokenization) {
 		Set<Token> projections = getProjectionElements(tokenization);
 		Set<Token> entities = getEntityElements(tokenization);
 		Set<Token> constraints = getConstraintElements(tokenization);
@@ -60,7 +61,7 @@ public class QueryGenerator {
 	}
 
 	private QueryBuilder fillQuery(Set<Token> projections, Set<Token> entities, Set<Token> constraints) {
-		QueryBuilder qb = new QueryBuilder(this.baseUrl);
+		QueryBuilder qb = new QueryBuilder(this.props);
 
 		qb.projection("title", "link");
 		for (Token token : projections) {
