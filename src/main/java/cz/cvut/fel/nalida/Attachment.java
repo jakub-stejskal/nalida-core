@@ -11,4 +11,9 @@ public class Attachment<T> {
 		this.target = target;
 		this.type = type;
 	}
+
+	@Override
+	public String toString() {
+		return this.source + "-" + this.type + "-" + this.target;
+	}
 }

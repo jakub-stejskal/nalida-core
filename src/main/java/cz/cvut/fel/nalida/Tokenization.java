@@ -21,7 +21,6 @@ public class Tokenization {
 
 	private Set<Attachment<Token>> createAttachments(Set<Attachment<Integer>> attachmentsTemplate) {
 		Set<Attachment<Token>> atts = new HashSet<>();
-
 		for (Attachment<Integer> attachment : attachmentsTemplate) {
 			Token source = this.tokens.get(attachment.source.intValue());
 			Token target = this.tokens.get(attachment.target.intValue());
@@ -42,7 +41,7 @@ public class Tokenization {
 		return Collections2.filter(this.tokens, new Predicate<Token>() {
 			@Override
 			public boolean apply(Token token) {
-				return token.getEntityType() == type;
+				return token.getElementType() == type;
 			}
 		});
 	}

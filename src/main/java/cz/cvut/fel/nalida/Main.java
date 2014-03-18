@@ -13,14 +13,20 @@ import java.util.Set;
 import cz.cvut.fel.nalida.db.Lexicon;
 import cz.cvut.fel.nalida.db.Query;
 import cz.cvut.fel.nalida.db.XmlParser;
+import cz.cvut.fel.nalida.stanford.SemanticAnnotator;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.semgraph.SemanticGraph;
+import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation;
+import edu.stanford.nlp.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.util.CoreMap;
 
 public class Main {
 
-	private static final String QUERIES_FILE = "data/queries2.txt";
+	private static final String QUERIES_FILE = "data/successful.txt";
 	static Scanner in = new Scanner(System.in);
 
 	private static SyntacticAnalysis syntacticAnalysis;
@@ -50,19 +56,18 @@ public class Main {
 			//			printSemanticInfo(tokenizations);
 			Tokenization tokenization = pickTokenization(tokenizations);
 
+			Query query = queryGenerator.generateQuery(tokenization);
 			System.out.println("Generated query:");
-			System.out.println(queryGenerator.generateQuery(tokenization));
+			System.out.println(query);
 			System.out.println();
 			System.out.println("Prettified query:");
-			System.out.println(queryGenerator.prettyPrintQuery(tokenization));
-
-			Query query = queryGenerator.generateQuery(tokenization);
 			System.out.println(query.toString());
+
 			System.out.println();
 			try {
-				System.out.println(new XmlParser().format(query.getResponse()));
+				System.out.println(new XmlParser(query.getResponse()).toString());
 			} catch (Exception e) {
-				System.out.println(e);
+				System.out.println();
 			}
 		}
 		br.close();
@@ -81,8 +86,7 @@ public class Main {
 		Properties props = new Properties();
 		props.load(Main.class.getClassLoader().getResourceAsStream("db.properties"));
 
-		queryGenerator = new QueryGenerator(null, props);
-
+		queryGenerator = new QueryGenerator(lexicon.getSchema(), props);
 	}
 
 	private static Tokenization pickTokenization(Set<Tokenization> tokenizations) throws IOException {
@@ -109,30 +113,30 @@ public class Main {
 			System.out.println(sentence.get(TextAnnotation.class));
 			System.out.println();
 
-			//			//					System.out.println(sentence.keySet());
-			//			//					System.out.println(sentence.get(TokensAnnotation.class).get(0).keySet());
-			//
-			//			// traversing the words in the current sentence
-			//			// a CoreLabel is a CoreMap with additional token-specific methods
-			//			for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
-			//
-			//				//				System.out.println(token.toShortString("Text", "PartOfSpeech", "Lemma", "NamedEntityTag", "Utterance", "Speaker"));
-			//				System.out.println(token.word() + " - " + token.lemma() + " - " + token.get(SemanticAnnotator.class));
-			//			}
+			//					System.out.println(sentence.keySet());
+			//					System.out.println(sentence.get(TokensAnnotation.class).get(0).keySet());
+
+			// traversing the words in the current sentence
+			// a CoreLabel is a CoreMap with additional token-specific methods
+			for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
+
+				//				System.out.println(token.toShortString("Text", "PartOfSpeech", "Lemma", "NamedEntityTag", "Utterance", "Speaker"));
+				System.out.println(token.word() + " - " + token.lemma() + " - " + token.get(SemanticAnnotator.class));
+			}
+			System.out.println();
+
+			//			// this is the parse tree of the current sentence
+			//			Tree tree = sentence.get(TreeAnnotation.class);
+			//			System.out.println("tree:  \n" + tree);
 			//			System.out.println();
-			//
-			//			//			// this is the parse tree of the current sentence
-			//			//			Tree tree = sentence.get(TreeAnnotation.class);
-			//			//			System.out.println("tree:  \n" + tree);
-			//			//			System.out.println();
-			//
-			//			// this is the Stanford dependency graph of the current sentence
-			//			SemanticGraph dependencies = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
-			//			System.out.println("dependencies: \n" + dependencies);
-			//			for (SemanticGraphEdge edge : dependencies.edgeListSorted()) {
-			//				System.out.println(edge.getGovernor() + " - " + edge.getRelation() + " - " + edge.getDependent());
-			//			}
-			//			System.out.println();
+
+			// this is the Stanford dependency graph of the current sentence
+			SemanticGraph dependencies = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
+			System.out.println("dependencies: \n" + dependencies);
+			for (SemanticGraphEdge edge : dependencies.edgeListSorted()) {
+				System.out.println(edge.getGovernor() + " - " + edge.getRelation() + " - " + edge.getDependent());
+			}
+			System.out.println();
 		}
 
 		//		// This is the coreference link graph

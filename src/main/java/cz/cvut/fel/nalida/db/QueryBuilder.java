@@ -21,10 +21,11 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 public class QueryBuilder {
 	private static final String PARAM_START = "?";
 	private static final String PARAM_DELIM = "&";
+	private final WebResource webResource;
 	protected String resource;
 	protected Set<String> projection;
 	protected Map<String, String> constraints;
-	private final WebResource webResource;
+	boolean isCollection = true;
 
 	public QueryBuilder(Properties properties) {
 
@@ -39,6 +40,11 @@ public class QueryBuilder {
 
 		this.projection = new HashSet<>();
 		this.constraints = new HashMap<>();
+	}
+
+	public QueryBuilder collection(boolean isColleciton) {
+		this.isCollection = isColleciton;
+		return this;
 	}
 
 	public QueryBuilder resource(String resource) {
@@ -69,7 +75,6 @@ public class QueryBuilder {
 		params.putAll(defaultParams());
 
 		return new Query(this.webResource.path(this.resource).queryParams(params));
-		//		return this.baseUrl + this.resource + PARAM_START + Joiner.on(PARAM_DELIM).skipNulls().join(params);
 	}
 
 	@Override
@@ -94,7 +99,8 @@ public class QueryBuilder {
 		if (this.projection.isEmpty()) {
 			return null;
 		}
-		return "entry(" + Joiner.on(",").skipNulls().join(this.projection) + ")";
+		String projections = Joiner.on(",").skipNulls().join(this.projection);
+		return this.isCollection ? "entry(" + projections + ")" : projections;
 	}
 
 	private String constraintsParam() {

@@ -2,11 +2,11 @@ package cz.cvut.fel.nalida.db;
 
 import static java.lang.String.format;
 
-import java.util.Map;
+import java.util.List;
 
 public final class Schema {
 	private String version;
-	private Map<String, Entity> schema;
+	private List<Entity> schema;
 
 	public String getVersion() {
 		return this.version;
@@ -16,12 +16,16 @@ public final class Schema {
 		this.version = version;
 	}
 
-	public Map<String, Entity> getSchema() {
+	public List<Entity> getSchema() {
 		return this.schema;
 	}
 
-	public void setSchema(Map<String, Entity> users) {
-		this.schema = users;
+	public void setSchema(List<Entity> schema) {
+		this.schema = schema;
+	}
+
+	public Object getPath(Element from, Element to) {
+		return null;
 	}
 
 	@Override

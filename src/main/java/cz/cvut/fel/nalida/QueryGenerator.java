@@ -9,6 +9,7 @@ import java.util.Set;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 
+import cz.cvut.fel.nalida.db.Element;
 import cz.cvut.fel.nalida.db.Lexicon.ElementType;
 import cz.cvut.fel.nalida.db.Query;
 import cz.cvut.fel.nalida.db.QueryBuilder;
@@ -26,31 +27,33 @@ public class QueryGenerator {
 	}
 
 	public Query generateQuery(Tokenization tokenization) {
-		Set<Token> projections = getProjectionElements(tokenization);
-		Set<Token> entities = getEntityElements(tokenization);
+		Set<Element> projections = getProjectionElements(tokenization);
+		Set<Element> entities = getEntityElements(tokenization);
 		Set<Token> constraints = getConstraintElements(tokenization);
+
+		return createQueryPlan(projections, entities, constraints);
+	}
+
+	private Query createQueryPlan(Set<Element> projections, Set<Element> entities, Set<Token> constraints) {
 		return fillQuery(projections, entities, constraints).build();
 	}
 
-	public String prettyPrintQuery(Tokenization tokenization) {
-		Set<Token> projections = getProjectionElements(tokenization);
-		Set<Token> entities = getEntityElements(tokenization);
-		Set<Token> constraints = getConstraintElements(tokenization);
-		return fillQuery(projections, entities, constraints).toString();
-	}
-
-	private Set<Token> getProjectionElements(Tokenization tokenization) {
+	private Set<Element> getProjectionElements(Tokenization tokenization) {
 		Token whToken = tokenization.getTokens(ElementType.WH_WORD).iterator().next();
-		return tokenization.getAttached(whToken);
+		Set<Element> elements = new HashSet<>();
+		for (Token token : tokenization.getAttached(whToken)) {
+			elements.add(token.getElement());
+		}
+		return elements;
 	}
 
-	private Set<Token> getEntityElements(Tokenization tokenization) {
-		Set<Token> entities = new HashSet<>();
+	private Set<Element> getEntityElements(Tokenization tokenization) {
+		Set<Element> entities = new HashSet<>();
 		for (Token token : tokenization.getTokens()) {
 			if (token.isType(ElementType.ENTITY)) {
-				entities.add(token);
+				entities.add(token.getEntityElement());
 			} else if (token.isType(ElementType.ATTRIBUTE, ElementType.VALUE)) {
-				entities.add(token.toEntityToken());
+				entities.add(token.getEntityElement());
 			}
 		}
 		return entities;
@@ -60,17 +63,17 @@ public class QueryGenerator {
 		return new HashSet<>(tokenization.getTokens(ElementType.VALUE));
 	}
 
-	private QueryBuilder fillQuery(Set<Token> projections, Set<Token> entities, Set<Token> constraints) {
+	private QueryBuilder fillQuery(Set<Element> projections, Set<Element> entities, Set<Token> constraints) {
 		QueryBuilder qb = new QueryBuilder(this.props);
 
 		qb.projection("title", "link");
-		for (Token token : projections) {
+		for (Element token : projections) {
 			qb.projection(getProjectionLabel(token, getResourceName(entities)));
 		}
 
 		Set<String> entityNames = new HashSet<>();
-		for (Token token : entities) {
-			entityNames.add(token.getEntityName() + "s"); // TODO Resource selection, Token->Resource
+		for (Element element : entities) {
+			entityNames.add(element.getElementName().toLowerCase() + "s"); // TODO Resource selection, Token->Resource
 		}
 		qb.resource(Joiner.on("-").join(entityNames));
 
@@ -80,24 +83,24 @@ public class QueryGenerator {
 		return qb;
 	}
 
-	private String getProjectionLabel(Token token, String resourceName) {
-		if (token.getEntityType() == ElementType.ENTITY && token.getEntityName().equals(resourceName)) {
+	private String getProjectionLabel(Element element, String resourceName) {
+		if (element.getElementType() == ElementType.ENTITY && element.getElementName().equals(resourceName)) {
 			return null;
 		}
-		if (token.getEntityName().startsWith(resourceName + ".")) {
-			return "content/" + token.getEntityName().replaceFirst(resourceName + ".", "");
+		if (element.getElementName().startsWith(resourceName + ".")) {
+			return "content/" + element.getElementName().replaceFirst(resourceName + ".", "");
 		}
-		return "content/" + token.getEntityName();
+		return "content/" + element.getElementName();
 	}
 
 	private String getConstraintLabel(Token token, String resourceName) {
-		if (token.getEntityName().startsWith(resourceName + ".")) {
-			return token.getEntityName().replaceFirst(resourceName + ".", "");
+		if (token.getElementName().startsWith(resourceName + ".")) {
+			return token.getElementName().replaceFirst(resourceName + ".", "");
 		}
-		return token.getEntityName();
+		return token.getElementName();
 	}
 
-	private String getResourceName(Set<Token> entities) {
-		return entities.iterator().next().getEntityName();
+	private String getResourceName(Set<Element> entities) {
+		return entities.iterator().next().getElementName();
 	}
 }

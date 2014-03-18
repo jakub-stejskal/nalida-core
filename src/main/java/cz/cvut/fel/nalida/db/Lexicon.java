@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -22,6 +23,7 @@ public class Lexicon {
 
 	Schema schema;
 	Map<String, SemSet> lexicon;
+	Set<Element> elements;
 	Lemmatizer lemmatizer;
 
 	public class SemSet extends HashSet<Token> {
@@ -36,52 +38,53 @@ public class Lexicon {
 
 	public Lexicon(String schemaPath) throws IOException {
 		this.schema = loadSchema(schemaPath);
-		this.lemmatizer = new Lemmatizer();
 		this.lexicon = new HashMap<>();
+		this.elements = new HashSet<>();
+		this.lemmatizer = new Lemmatizer();
 		loadLexicon(schemaPath);
 	}
 
 	private Schema loadSchema(String schemaPath) throws FileNotFoundException {
 		InputStream input = new FileInputStream(new File(schemaPath + SCHEMA_FILENAME));
-		Yaml yaml = new Yaml();
-		return yaml.loadAs(input, Schema.class);
+		return new Yaml().loadAs(input, Schema.class);
 	}
 
 	private void loadLexicon(String schemaPath) throws IOException {
-		for (String entity : this.schema.getSchema().keySet()) {
-			loadEntity(entity, this.schema.getSchema().get(entity));
-			for (Attribute attribute : this.schema.getSchema().get(entity).getAttributes()) {
+		for (Entity entity : this.schema.getSchema()) {
+			loadEntity(entity);
+			for (Attribute attribute : entity.getAttributes()) {
 				loadAttribute(entity, attribute);
-				loadValues(schemaPath, entity, attribute.getName());
-
+				loadValues(schemaPath, entity, attribute);
 			}
 		}
 		loadCommons(schemaPath);
 	}
 
-	private void loadEntity(String entityName, Entity entity) {
-		String token = entityName;
-		putToSemSet(token, entityName, ElementType.ENTITY);
+	private void loadEntity(Entity entity) {
+		String token = entity.getName().toLowerCase();
+		putToSemSet(token, entity.getName(), ElementType.ENTITY);
 	}
 
-	private void loadAttribute(String entity, Attribute attribute) {
+	private void loadAttribute(Entity entity, Attribute attribute) {
 		String name = attribute.getName();
 		for (String token : attribute.getTokens()) {
-			putToSemSet(token, entity + "." + name, ElementType.ATTRIBUTE);
+			putToSemSet(token, entity.getName() + "." + name, ElementType.ATTRIBUTE);
 		}
 	}
 
-	private void loadValues(String schemaPath, String entity, String attribute) throws IOException {
-		String valueFilename = format("%s%s.%s.values", schemaPath, entity, attribute);
+	private void loadValues(String schemaPath, Entity entity, Attribute attribute) throws IOException {
+		if (attribute.isPrimitiveType()) {
+			String valueFilename = format("%s%s.%s.values", schemaPath, entity.getName(), attribute.getName());
 
-		BufferedReader br = new BufferedReader(new FileReader(valueFilename));
-		String line;
-		while ((line = br.readLine()) != null) {
-			for (String token : this.lemmatizer.getLemmas(line)) {
-				putToSemSet(token, entity + "." + attribute, ElementType.VALUE);
+			BufferedReader br = new BufferedReader(new FileReader(valueFilename));
+			String line;
+			while ((line = br.readLine()) != null) {
+				for (String token : this.lemmatizer.getLemmas(line)) {
+					putToSemSet(token, entity.getName() + "." + attribute.getName(), ElementType.VALUE);
+				}
 			}
+			br.close();
 		}
-		br.close();
 	}
 
 	private void loadCommons(String schemaPath) throws IOException {
@@ -91,7 +94,6 @@ public class Lexicon {
 		String token;
 		while ((token = br.readLine()) != null) {
 			putToSemSet(token, token, ElementType.WH_WORD);
-
 		}
 		br.close();
 	}
@@ -109,6 +111,10 @@ public class Lexicon {
 		return this.lexicon.get(lemma.toLowerCase());
 	}
 
+	public Schema getSchema() {
+		return this.schema;
+	}
+
 	@Override
 	public String toString() {
 		return "schema: \n" + this.schema + "\nlexicon: \n" + this.lexicon;
@@ -116,8 +122,7 @@ public class Lexicon {
 
 	public static void main(String[] args) throws Exception {
 		Lexicon l = new Lexicon("data/schema/");
-		System.out.println(l.schema);
-		System.out.println(l.lexicon);
+		System.out.println(l);
 	}
 
 }

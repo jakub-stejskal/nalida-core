@@ -8,6 +8,11 @@ import java.io.Writer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
@@ -24,23 +29,10 @@ import org.xml.sax.SAXException;
  * </code>
  */
 public class XmlParser {
+	final Document document;
 
-	public String format(String unformattedXml) {
-		try {
-			final Document document = parseXmlFile(unformattedXml);
-
-			OutputFormat format = new OutputFormat(document);
-			format.setLineWidth(65);
-			format.setIndenting(true);
-			format.setIndent(2);
-			Writer out = new StringWriter();
-			XMLSerializer serializer = new XMLSerializer(out, format);
-			serializer.serialize(document);
-
-			return out.toString();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public XmlParser(String xmlDocument) {
+		this.document = parseXmlFile(xmlDocument);
 	}
 
 	private Document parseXmlFile(String in) {
@@ -58,14 +50,27 @@ public class XmlParser {
 		}
 	}
 
-	public static void main(String[] args) {
-		String unformattedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><QueryMessage\n"
-				+ "        xmlns=\"http://www.SDMX.org/resources/SDMXML/schemas/v2_0/message\"\n"
-				+ "        xmlns:query=\"http://www.SDMX.org/resources/SDMXML/schemas/v2_0/query\">\n" + "    <Query>\n"
-				+ "        <query:CategorySchemeWhere>\n" + "   \t\t\t\t\t         <query:AgencyID>ECB\n\n\n\n</query:AgencyID>\n"
-				+ "        </query:CategorySchemeWhere>\n" + "    </Query>\n\n\n\n\n" + "</QueryMessage>";
+	@Override
+	public String toString() {
+		try {
+			OutputFormat format = new OutputFormat(this.document);
+			format.setLineWidth(65);
+			format.setIndenting(true);
+			format.setIndent(2);
+			Writer out = new StringWriter();
+			XMLSerializer serializer = new XMLSerializer(out, format);
+			serializer.serialize(this.document);
+			return out.toString();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-		System.out.println(new XmlParser().format(unformattedXml));
+	public String query(String xpathQuery) throws XPathExpressionException {
+		XPathFactory xPathfactory = XPathFactory.newInstance();
+		XPath xpath = xPathfactory.newXPath();
+		XPathExpression expr = xpath.compile(xpathQuery);
+		return (String) expr.evaluate(this.document, XPathConstants.STRING);
 	}
 
 }

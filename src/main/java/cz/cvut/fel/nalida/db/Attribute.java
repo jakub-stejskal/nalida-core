@@ -23,6 +23,10 @@ public class Attribute {
 		return this.type;
 	}
 
+	public boolean isPrimitiveType() {
+		return this.type.equals("string") || this.type.equals("integer");
+	}
+
 	public void setTokens(List<String> tokens) {
 		this.tokens = tokens;
 	}
