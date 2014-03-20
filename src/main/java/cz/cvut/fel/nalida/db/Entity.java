@@ -2,18 +2,24 @@ package cz.cvut.fel.nalida.db;
 
 import java.util.List;
 
-public class Entity {
-	private String name;
+public class Entity extends Element {
 	private String resource;
 	private List<Attribute> attributes;
 	private List<Attribute> subresources;
 
-	public void setName(String name) {
-		this.name = name;
+	@Override
+	public ElementType getElementType() {
+		return ElementType.ENTITY;
 	}
 
-	public String getName() {
-		return this.name;
+	@Override
+	public Entity toEntityElement() {
+		return this;
+	}
+
+	@Override
+	protected Element getParent() {
+		throw new UnsupportedOperationException("Entity does not have parent");
 	}
 
 	public void setResource(String resource) {
@@ -40,8 +46,7 @@ public class Entity {
 		return this.subresources;
 	}
 
-	@Override
-	public String toString() {
-		return "myAttr:" + this.attributes.toString() + ", mySubRes:" + this.attributes.toString();
+	public String toStringDeep() {
+		return this.name + "\n " + this.resource + "\n Attributes:" + this.attributes + ",\n Subresources:" + this.subresources;
 	}
 }

@@ -1,5 +1,8 @@
 package cz.cvut.fel.nalida.db;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
@@ -24,6 +27,10 @@ public class Query {
 
 	@Override
 	public String toString() {
-		return this.webResource.toString();
+		try {
+			return URLDecoder.decode(this.webResource.toString(), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			return this.webResource.toString();
+		}
 	}
 }

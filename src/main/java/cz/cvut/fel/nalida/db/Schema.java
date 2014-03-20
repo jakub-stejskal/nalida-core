@@ -4,6 +4,8 @@ import static java.lang.String.format;
 
 import java.util.List;
 
+import com.google.common.base.Joiner;
+
 public final class Schema {
 	private String version;
 	private List<Entity> schema;
@@ -24,12 +26,20 @@ public final class Schema {
 		this.schema = schema;
 	}
 
-	public Object getPath(Element from, Element to) {
-		return null;
-	}
-
 	@Override
 	public String toString() {
-		return new StringBuilder().append(format("Version: %s\n", this.version)).append(format("mySchema: %s\n", this.schema)).toString();
+		return new StringBuilder().append(format("Version: %s\n", this.version)).append(format("Schema: \n%s\n", Joiner.on("\n").join(this.schema))).toString();
+	}
+
+	public Schema linkReferences() {
+		for (Entity entity : this.schema) {
+			for (Attribute attribute : entity.getAttributes()) {
+				attribute.parent = entity;
+			}
+			for (Attribute attribute : entity.getSubresources()) {
+				attribute.parent = entity;
+			}
+		}
+		return this;
 	}
 }

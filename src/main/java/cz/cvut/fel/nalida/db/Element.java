@@ -1,58 +1,64 @@
 package cz.cvut.fel.nalida.db;
 
-import cz.cvut.fel.nalida.db.Lexicon.ElementType;
+abstract public class Element {
 
-public class Element {
+	public static Element WH_ELEMENT = new Element() {
+		@Override
+		public ElementType getElementType() {
+			return ElementType.WH_WORD;
+		}
 
-	protected Element parent;
-	protected ElementType elementType;
-	protected String elementName;
+		@Override
+		public Entity toEntityElement() {
+			throw new UnsupportedOperationException("WhElement cannot be converted to EntityElement");
+		}
 
-	public Element(ElementType elementType, String elementName) {
-		this.elementType = elementType;
-		this.elementName = elementName;
+		@Override
+		public Entity getParent() {
+			throw new UnsupportedOperationException("WhElement does not have parent");
+		}
+	};
+
+	public enum ElementType {
+		ATTRIBUTE, ENTITY, VALUE, WH_WORD;
 	}
 
-	public ElementType getElementType() {
-		return this.elementType;
+	protected String name;
+
+	public Element() {
 	}
 
-	public String getElementName() {
-		return this.elementName;
+	abstract public ElementType getElementType();
+
+	abstract public Entity toEntityElement();
+
+	abstract protected Element getParent();
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return this.name;
 	}
 
 	@Override
 	public String toString() {
-		return this.elementType + "/" + this.elementName;
+		return getElementType() + "/" + getName();
 	}
 
-	public boolean isType(ElementType... types) {
+	public boolean isElementType(ElementType... types) {
 		for (ElementType type : types) {
-			if (this.elementType == type) {
+			if (getElementType() == type) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public Element toEntityElement() {
-		switch (this.elementType) {
-		case ENTITY:
-			return this;
-		case ATTRIBUTE:
-			return this.parent;
-		case VALUE:
-			return this.parent.parent;
-		case WH_WORD:
-			throw new UnsupportedOperationException("Wh-word cannot be converted to Entity");
-		default:
-			throw new UnsupportedOperationException("Unknown element type.");
-		}
-	}
-
 	@Override
 	public int hashCode() {
-		return this.elementName.hashCode() + this.elementType.hashCode();
+		return getName().hashCode() + getElementType().hashCode();
 	}
 
 	@Override
@@ -63,8 +69,8 @@ public class Element {
 		if (!(that instanceof Element))
 			return false;
 
-		Element thatToken = (Element) that;
+		Element thatElement = (Element) that;
 
-		return this.elementName.equals(thatToken.elementName) && this.elementType.equals(thatToken.elementType);
+		return getName().equals(thatElement.getName()) && getElementType().equals(thatElement.getElementType());
 	}
 }

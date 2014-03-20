@@ -10,7 +10,6 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import cz.cvut.fel.nalida.db.Lexicon;
-import cz.cvut.fel.nalida.db.Lexicon.SemSet;
 import cz.cvut.fel.nalida.stanford.SemanticAnnotator;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
@@ -42,19 +41,15 @@ public class SemanticAnalysis {
 		List<CoreMap> sentences = annotatedLine.get(SentencesAnnotation.class);
 		CoreMap sentence = sentences.get(0);
 		//		for (CoreMap sentence : sentences) {
-		List<CoreLabel> tokens = sentence.get(TokensAnnotation.class);
+		List<CoreLabel> stanfordTokens = sentence.get(TokensAnnotation.class);
 		SemanticGraph dependencyTree = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
 		int position = 0;
 		for (IndexedWord vertex : dependencyTree.vertexListSorted()) {
 			int index = vertex.index();
-			CoreLabel token = tokens.get(index - 1);
-			SemSet semSet = token.get(SemanticAnnotator.class);
-			if (semSet != null) {
+			CoreLabel stanfordToken = stanfordTokens.get(index - 1);
+			Set<Token> tokenSet = stanfordToken.get(SemanticAnnotator.class);
+			if (tokenSet != null) {
 				tokenIndices.put(Integer.valueOf(index), Integer.valueOf(position++));
-				Set<Token> tokenSet = new HashSet<>();
-				for (Token t : semSet) {
-					tokenSet.add(new Token(Sets.newHashSet(token.word()), t));
-				}
 				tokenSets.add(tokenSet);
 			}
 		}

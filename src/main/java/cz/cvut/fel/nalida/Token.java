@@ -3,26 +3,27 @@ package cz.cvut.fel.nalida;
 import java.util.Set;
 
 import cz.cvut.fel.nalida.db.Element;
-import cz.cvut.fel.nalida.db.Lexicon.ElementType;
+import cz.cvut.fel.nalida.db.Element.ElementType;
+import cz.cvut.fel.nalida.db.Entity;
 
 public class Token {
 	protected Set<String> words;
-	protected ElementType elementType;
-	protected String elementName;
+	protected Element element;
+	protected Set<Element> elements;
 
-	public Token(ElementType elementType, String elementName) {
-		this(null, elementType, elementName);
-	}
-
-	public Token(Set<String> words, Token token) {
-		this(words, token.elementType, token.elementName);
-	}
-
-	public Token(Set<String> words, ElementType elementType, String elementName) {
+	//
+	//	public Token(ElementType elementType, String elementName) {
+	//		this(null, elementType, elementName);
+	//	}
+	//
+	//	public Token(Set<String> words, Token token) {
+	//		this(words, token.elementType, token.elementName);
+	//	}
+	//
+	public Token(Set<String> words, Element element) {
 		super();
 		this.words = words;
-		this.elementType = elementType;
-		this.elementName = elementName;
+		this.element = element;
 	}
 
 	public Set<String> getWords() {
@@ -30,40 +31,33 @@ public class Token {
 	}
 
 	public ElementType getElementType() {
-		return this.elementType;
+		return this.element.getElementType();
 	}
 
 	public String getElementName() {
-		return this.elementName;
+		return this.element.getName();
 	}
 
 	@Override
 	public String toString() {
-		return this.words + "/" + this.elementType + "/" + this.elementName;
+		return this.words + "/" + this.element;
 	}
 
 	public boolean isType(ElementType... types) {
 		for (ElementType type : types) {
-			if (this.elementType == type) {
+			if (this.element.getElementType() == type) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public Element getEntityElement() {
-		try {
-			if (this.elementType == ElementType.ENTITY) {
-				return new Element(ElementType.ENTITY, this.elementName);
-			}
-			return new Element(ElementType.ENTITY, this.elementName.split("\\.")[0]);
-		} catch (Exception e) {
-			throw new RuntimeException(this.elementName, e);
-		}
+	public Entity getEntityElement() {
+		return this.element.toEntityElement();
 	}
 
 	public Element getElement() {
-		return new Element(ElementType.ENTITY, this.elementName);
+		return this.element;
 	}
 
 	@Override
@@ -76,6 +70,6 @@ public class Token {
 
 		Token thatToken = (Token) that;
 
-		return this.words.equals(thatToken.words) && this.elementType.equals(thatToken.elementType) && this.elementName.equals(thatToken.elementName);
+		return this.words.equals(thatToken.words) && this.element.equals(thatToken.element);
 	}
 }

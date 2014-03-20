@@ -2,17 +2,29 @@ package cz.cvut.fel.nalida.db;
 
 import java.util.List;
 
-public class Attribute {
-	private String name;
+public class Attribute extends Element {
 	private String type;
 	private List<String> tokens;
+	private final Value valueElement;
+	protected Entity parent;
 
-	public void setName(String name) {
-		this.name = name;
+	public Attribute() {
+		this.valueElement = new Value(this);
 	}
 
-	public String getName() {
-		return this.name;
+	@Override
+	public ElementType getElementType() {
+		return ElementType.ATTRIBUTE;
+	}
+
+	@Override
+	public Entity toEntityElement() {
+		return getParent();
+	}
+
+	@Override
+	protected Entity getParent() {
+		return this.parent;
 	}
 
 	public void setType(String type) {
@@ -27,6 +39,10 @@ public class Attribute {
 		return this.type.equals("string") || this.type.equals("integer");
 	}
 
+	public Value getValueElement() {
+		return this.valueElement;
+	}
+
 	public void setTokens(List<String> tokens) {
 		this.tokens = tokens;
 	}
@@ -37,6 +53,6 @@ public class Attribute {
 
 	@Override
 	public String toString() {
-		return "myNameTokens:" + this.name + "," + this.tokens;
+		return getElementType() + "/" + getName();
 	}
 }

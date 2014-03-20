@@ -82,7 +82,7 @@ public class QueryBuilder {
 		List<String> params = new ArrayList<>();
 		params.add(projectionParam());
 		params.add(constraintsParam());
-		return "/" + this.resource + "\n" + PARAM_START + Joiner.on("\n" + PARAM_DELIM).skipNulls().join(params);
+		return this.resource + "\n" + PARAM_START + Joiner.on("\n" + PARAM_DELIM).skipNulls().join(params);
 
 	}
 
@@ -100,7 +100,7 @@ public class QueryBuilder {
 			return null;
 		}
 		String projections = Joiner.on(",").skipNulls().join(this.projection);
-		return this.isCollection ? "entry(" + projections + ")" : projections;
+		return this.isCollection ? "id,link,entry(" + projections + ")" : projections;
 	}
 
 	private String constraintsParam() {

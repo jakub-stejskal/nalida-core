@@ -47,27 +47,27 @@ public class Main {
 		String line;
 
 		while ((line = br.readLine()) != null) {
-			System.out.println("\n XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
-			System.out.println(line);
-
-			Annotation annotatedLine = syntacticAnalysis.process(line);
-			//			printSyntacticInfo(annotatedLine);
-			Set<Tokenization> tokenizations = semanticAnalysis.getTokenizations(annotatedLine);
-			//			printSemanticInfo(tokenizations);
-			Tokenization tokenization = pickTokenization(tokenizations);
-
-			Query query = queryGenerator.generateQuery(tokenization);
-			System.out.println("Generated query:");
-			System.out.println(query);
-			System.out.println();
-			System.out.println("Prettified query:");
-			System.out.println(query.toString());
-
-			System.out.println();
 			try {
-				System.out.println(new XmlParser(query.getResponse()).toString());
-			} catch (Exception e) {
+				System.out.println("\n XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
+				System.out.println(line);
+
+				Annotation annotatedLine = syntacticAnalysis.process(line);
+				//			printSyntacticInfo(annotatedLine);
+				Set<Tokenization> tokenizations = semanticAnalysis.getTokenizations(annotatedLine);
+				//			printSemanticInfo(tokenizations);
+				Tokenization tokenization = pickTokenization(tokenizations);
+
+				Query query = queryGenerator.generateQuery(tokenization);
+				System.out.println("Generated query:");
+				System.out.println(query);
 				System.out.println();
+				try {
+					System.out.println(new XmlParser(query.getResponse()).toString());
+				} catch (Exception e) {
+					System.out.println();
+				}
+			} catch (UnsupportedOperationException e) {
+				e.printStackTrace();
 			}
 		}
 		br.close();

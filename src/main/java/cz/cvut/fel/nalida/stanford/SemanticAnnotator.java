@@ -6,21 +6,24 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import cz.cvut.fel.nalida.Token;
 import cz.cvut.fel.nalida.db.Lexicon;
-import cz.cvut.fel.nalida.db.Lexicon.SemSet;
 import edu.stanford.nlp.ling.CoreAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.Annotator;
 
-public class SemanticAnnotator implements Annotator, CoreAnnotation<Lexicon.SemSet> {
+public class SemanticAnnotator implements Annotator, CoreAnnotation<Set<Token>> {
 
 	public static final String ANNOTATOR_CLASS = "semantic";
 	public static final String SCHEMA_PATH = "semantic-path";
 	public static final Requirement SEMSET_REQUIREMENT = new Requirement(ANNOTATOR_CLASS);
 
 	private final Lexicon lexicon;
+
+	@SuppressWarnings("rawtypes")
+	private static Class<? extends Set> tokenSet = Collections.<Token> emptySet().getClass();
 
 	public SemanticAnnotator(String annotatorClass, Properties props) throws IOException {
 		this(annotatorClass, props, loadLexicon(props));
@@ -62,8 +65,9 @@ public class SemanticAnnotator implements Annotator, CoreAnnotation<Lexicon.SemS
 		return TOKENIZE_SSPLIT_POS_LEMMA;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Class<SemSet> getType() {
-		return SemSet.class;
+	public Class<Set<Token>> getType() {
+		return (Class<Set<Token>>) tokenSet;
 	}
 }

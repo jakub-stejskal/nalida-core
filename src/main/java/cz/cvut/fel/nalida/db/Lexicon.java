@@ -16,37 +16,31 @@ import java.util.Set;
 
 import org.yaml.snakeyaml.Yaml;
 
+import com.google.common.collect.Sets;
+
 import cz.cvut.fel.nalida.Lemmatizer;
 import cz.cvut.fel.nalida.Token;
 
 public class Lexicon {
 
 	Schema schema;
-	Map<String, SemSet> lexicon;
-	Set<Element> elements;
+	Map<String, Set<Token>> lexicon;
+	Map<String, Element> elements;
 	Lemmatizer lemmatizer;
-
-	public class SemSet extends HashSet<Token> {
-		private static final long serialVersionUID = 1L;
-	}
-
-	public enum ElementType {
-		ATTRIBUTE, ENTITY, VALUE, WH_WORD;
-	}
 
 	private static final String SCHEMA_FILENAME = "schema.desc";
 
 	public Lexicon(String schemaPath) throws IOException {
 		this.schema = loadSchema(schemaPath);
 		this.lexicon = new HashMap<>();
-		this.elements = new HashSet<>();
+		this.elements = new HashMap<>();
 		this.lemmatizer = new Lemmatizer();
 		loadLexicon(schemaPath);
 	}
 
 	private Schema loadSchema(String schemaPath) throws FileNotFoundException {
 		InputStream input = new FileInputStream(new File(schemaPath + SCHEMA_FILENAME));
-		return new Yaml().loadAs(input, Schema.class);
+		return new Yaml().loadAs(input, Schema.class).linkReferences();
 	}
 
 	private void loadLexicon(String schemaPath) throws IOException {
@@ -62,13 +56,12 @@ public class Lexicon {
 
 	private void loadEntity(Entity entity) {
 		String token = entity.getName().toLowerCase();
-		putToSemSet(token, entity.getName(), ElementType.ENTITY);
+		putToSemSet(token, entity);
 	}
 
 	private void loadAttribute(Entity entity, Attribute attribute) {
-		String name = attribute.getName();
 		for (String token : attribute.getTokens()) {
-			putToSemSet(token, entity.getName() + "." + name, ElementType.ATTRIBUTE);
+			putToSemSet(token, attribute);
 		}
 	}
 
@@ -80,7 +73,7 @@ public class Lexicon {
 			String line;
 			while ((line = br.readLine()) != null) {
 				for (String token : this.lemmatizer.getLemmas(line)) {
-					putToSemSet(token, entity.getName() + "." + attribute.getName(), ElementType.VALUE);
+					putToSemSet(token, attribute.getValueElement());
 				}
 			}
 			br.close();
@@ -93,21 +86,21 @@ public class Lexicon {
 		BufferedReader br = new BufferedReader(new FileReader(valueFilename));
 		String token;
 		while ((token = br.readLine()) != null) {
-			putToSemSet(token, token, ElementType.WH_WORD);
+			putToSemSet(token, Element.WH_ELEMENT);
 		}
 		br.close();
 	}
 
-	private void putToSemSet(String token, String name, ElementType type) {
-		SemSet semSet = this.lexicon.get(token);
-		if (semSet == null) {
-			semSet = new SemSet();
-			this.lexicon.put(token, semSet);
+	private void putToSemSet(String lemma, Element element) {
+		Set<Token> tokenSet = this.lexicon.get(lemma);
+		if (tokenSet == null) {
+			tokenSet = new HashSet<>();
+			this.lexicon.put(lemma, tokenSet);
 		}
-		semSet.add(new Token(type, name));
+		tokenSet.add(new Token(Sets.newHashSet(lemma), element));
 	}
 
-	public SemSet getSemSet(String lemma) {
+	public Set<Token> getSemSet(String lemma) {
 		return this.lexicon.get(lemma.toLowerCase());
 	}
 
