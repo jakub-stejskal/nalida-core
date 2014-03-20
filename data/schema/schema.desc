@@ -1,0 +1,65 @@
+version: 1.0
+
+schema:
+  - name: Teacher
+    resource: /teachers
+    attributes:
+      - name:   username
+        type:   string
+        tokens: [username]
+      - name:   firstName
+        type:   string
+        tokens: [name]
+      - name:   lastName
+        type:   string
+        tokens: [name, surname]
+      - name:   phone
+        type:   string
+        tokens: [phone, number]
+      - name:   division
+        type:   Department
+        tokens: [division]
+      - name:   supervisionPhDStudents
+        type:   string
+        tokens: [supervision]
+    subresources:
+      - name:   /courses
+        type:   Course
+        tokens: [teach]
+#      - name:   /parallels
+#        type:   Parallel
+#        tokens: [lecture, instruct]
+  - name: Course
+    resource: /courses
+    attributes:
+      - name:   name
+        type:   string
+        tokens: [name]
+      - name:   code
+        type:   string
+        tokens: [code]
+      - name:   credits
+        type:   integer
+        tokens: [credit]
+      - name:   department
+        type:   Department
+        tokens: [department]
+  - name: Department
+    resource: /departments
+    attributes:
+      - name:   name
+        type:   string
+        tokens: [name]
+      - name:   code
+        type:   string
+        tokens: [code]
+    subresources:
+      - name:   /teachers
+        type:   Teacher
+        tokens: [employ]
+      - name:   /courses
+        type:   Course
+        tokens: [teach, manage]
+      - name:   /subdivisions
+        type:   Department
+        tokens: [subdivision]
