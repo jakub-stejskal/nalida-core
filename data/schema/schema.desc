@@ -17,8 +17,8 @@ schema:
         type:   string
         tokens: [phone, number]
       - name:   division
-        type:   Department
-        tokens: [division]
+        type:   Division
+        tokens: [division, department]
       - name:   supervisionPhDStudents
         type:   string
         tokens: [supervision]
@@ -26,9 +26,7 @@ schema:
       - name:   /courses
         type:   Course
         tokens: [teach]
-#      - name:   /parallels
-#        type:   Parallel
-#        tokens: [lecture, instruct]
+
   - name: Course
     resource: /courses
     attributes:
@@ -42,10 +40,11 @@ schema:
         type:   integer
         tokens: [credit]
       - name:   department
-        type:   Department
+        type:   Division
         tokens: [department]
-  - name: Department
-    resource: /departments
+
+  - name: Division
+    resource: /divisions
     attributes:
       - name:   name
         type:   string
@@ -61,5 +60,5 @@ schema:
         type:   Course
         tokens: [teach, manage]
       - name:   /subdivisions
-        type:   Department
+        type:   Division
         tokens: [subdivision]

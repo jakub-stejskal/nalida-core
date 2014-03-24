@@ -53,6 +53,6 @@ public class Attribute extends Element {
 
 	@Override
 	public String toString() {
-		return getElementType() + "/" + getName();
+		return getElementType() + "/" + toEntityElement().getName() + "." + getName();
 	}
 }

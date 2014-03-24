@@ -97,9 +97,9 @@ public class QueryGenerator {
 		if (constraintEntity.equals(resourceEntity)) {
 			return constraintElement.getName();
 		} else {
-			for (Attribute attribute : resourceEntity.getAttributes()) {
-				if (attribute.getType().equals(constraintEntity.getName())) {
-					return attribute.getName() + "." + constraintElement.getName();
+			for (Attribute resourceAttribute : resourceEntity.getAttributes()) {
+				if (resourceAttribute.getType().equals(constraintEntity.getName())) {
+					return resourceAttribute.getName() + "." + constraintElement.getName();
 				}
 			}
 		}

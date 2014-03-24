@@ -26,7 +26,7 @@ import edu.stanford.nlp.util.CoreMap;
 
 public class Main {
 
-	private static final String QUERIES_FILE = "data/successful.txt";
+	private static final String QUERIES_FILE = "data/dev.txt";
 	static Scanner in = new Scanner(System.in);
 
 	private static SyntacticAnalysis syntacticAnalysis;
@@ -42,12 +42,18 @@ public class Main {
 
 		initializeModules();
 
+		System.out.println(lexicon);
+
 		File file = new File(QUERIES_FILE);
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		String line;
 
 		while ((line = br.readLine()) != null) {
 			try {
+				if (line.isEmpty() || line.startsWith("#")) {
+					continue;
+				}
+
 				System.out.println("\n XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
 				System.out.println(line);
 
@@ -56,6 +62,8 @@ public class Main {
 				Set<Tokenization> tokenizations = semanticAnalysis.getTokenizations(annotatedLine);
 				//			printSemanticInfo(tokenizations);
 				Tokenization tokenization = pickTokenization(tokenizations);
+				System.out.println("Selected tokenization: ");
+				System.out.println(tokenization);
 
 				Query query = queryGenerator.generateQuery(tokenization);
 				System.out.println("Generated query:");
@@ -64,10 +72,10 @@ public class Main {
 				try {
 					System.out.println(new XmlParser(query.getResponse()).toString());
 				} catch (Exception e) {
-					System.out.println();
+					e.printStackTrace(System.out);
 				}
-			} catch (UnsupportedOperationException e) {
-				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace(System.out);
 			}
 		}
 		br.close();

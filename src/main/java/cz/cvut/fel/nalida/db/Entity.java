@@ -1,11 +1,12 @@
 package cz.cvut.fel.nalida.db;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Entity extends Element {
 	private String resource;
-	private List<Attribute> attributes;
-	private List<Attribute> subresources;
+	private List<Attribute> attributes = Collections.emptyList();
+	private List<Attribute> subresources = Collections.emptyList();
 
 	@Override
 	public ElementType getElementType() {

@@ -26,4 +26,9 @@ public class Value extends Element {
 	public String getName() {
 		return this.parent.getName();
 	}
+
+	@Override
+	public String toString() {
+		return getElementType() + "/" + toEntityElement().getName() + "." + getName();
+	}
 }
