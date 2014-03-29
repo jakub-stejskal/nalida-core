@@ -50,6 +50,9 @@ public class Lexicon {
 				loadAttribute(entity, attribute);
 				loadValues(schemaPath, entity, attribute);
 			}
+			for (Attribute attribute : entity.getSubresources()) {
+				loadAttribute(entity, attribute);
+			}
 		}
 		loadCommons(schemaPath);
 	}

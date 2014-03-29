@@ -20,7 +20,7 @@ abstract public class Element {
 	};
 
 	public enum ElementType {
-		ATTRIBUTE, ENTITY, VALUE, WH_WORD;
+		ATTRIBUTE, ENTITY, VALUE, WH_WORD, SUBRESOURCE;
 	}
 
 	protected String name;

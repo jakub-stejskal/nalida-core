@@ -4,6 +4,7 @@ import java.util.List;
 
 public class Attribute extends Element {
 	private String type;
+	protected Entity typeEntity;
 	private List<String> tokens;
 	private final Value valueElement;
 	protected Entity parent;
@@ -15,6 +16,10 @@ public class Attribute extends Element {
 	@Override
 	public ElementType getElementType() {
 		return ElementType.ATTRIBUTE;
+	}
+
+	public Entity getTypeEntity() {
+		return this.typeEntity;
 	}
 
 	@Override
@@ -29,6 +34,10 @@ public class Attribute extends Element {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public void setTypeEntity(Entity typeEntity) {
+		this.typeEntity = typeEntity;
 	}
 
 	public String getType() {

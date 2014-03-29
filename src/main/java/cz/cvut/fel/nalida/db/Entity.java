@@ -6,7 +6,7 @@ import java.util.List;
 public class Entity extends Element {
 	private String resource;
 	private List<Attribute> attributes = Collections.emptyList();
-	private List<Attribute> subresources = Collections.emptyList();
+	private List<Subresource> subresources = Collections.emptyList();
 
 	@Override
 	public ElementType getElementType() {
@@ -39,11 +39,11 @@ public class Entity extends Element {
 		return this.attributes;
 	}
 
-	public void setSubresources(List<Attribute> subresources) {
+	public void setSubresources(List<Subresource> subresources) {
 		this.subresources = subresources;
 	}
 
-	public List<Attribute> getSubresources() {
+	public List<Subresource> getSubresources() {
 		return this.subresources;
 	}
 

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,6 +19,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -66,11 +69,16 @@ public class XmlParser {
 		}
 	}
 
-	public String query(String xpathQuery) throws XPathExpressionException {
+	public List<String> query(String xpathQuery) throws XPathExpressionException {
 		XPathFactory xPathfactory = XPathFactory.newInstance();
 		XPath xpath = xPathfactory.newXPath();
 		XPathExpression expr = xpath.compile(xpathQuery);
-		return (String) expr.evaluate(this.document, XPathConstants.STRING);
+		NodeList nlist = (NodeList) expr.evaluate(this.document, XPathConstants.NODESET);
+		List<String> resultList = new ArrayList<String>();
+		for (int i = 0; i < nlist.getLength(); i++) {
+			resultList.add(nlist.item(i).getNodeValue());
+		}
+		return resultList;
 	}
 
 }

@@ -11,7 +11,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 import cz.cvut.fel.nalida.db.Lexicon;
-import cz.cvut.fel.nalida.db.Query;
+import cz.cvut.fel.nalida.db.QueryPlan;
 import cz.cvut.fel.nalida.db.XmlParser;
 import cz.cvut.fel.nalida.stanford.SemanticAnnotator;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
@@ -65,12 +65,14 @@ public class Main {
 				System.out.println("Selected tokenization: ");
 				System.out.println(tokenization);
 
-				Query query = queryGenerator.generateQuery(tokenization);
+				QueryPlan queryPlan = queryGenerator.generateQuery(tokenization);
 				System.out.println("Generated query:");
-				System.out.println(query);
+				System.out.println(queryPlan);
 				System.out.println();
 				try {
-					System.out.println(new XmlParser(query.getResponse()).toString());
+					for (String queryResult : queryPlan.execute()) {
+						System.out.println(new XmlParser(queryResult).toString());
+					}
 				} catch (Exception e) {
 					e.printStackTrace(System.out);
 				}
@@ -98,6 +100,7 @@ public class Main {
 	}
 
 	private static Tokenization pickTokenization(Set<Tokenization> tokenizations) throws IOException {
+		System.out.println("pickTokenization: " + tokenizations.size());
 		if (tokenizations.size() == 1) {
 			return tokenizations.iterator().next();
 		}
