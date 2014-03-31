@@ -42,9 +42,13 @@ abstract public class Element {
 		return this.name;
 	}
 
+	public String getLongName() {
+		return this.name;
+	}
+
 	@Override
 	public String toString() {
-		return getElementType() + "/" + getName();
+		return getElementType() + "/" + getLongName();
 	}
 
 	public boolean isElementType(ElementType... types) {
@@ -58,7 +62,7 @@ abstract public class Element {
 
 	@Override
 	public int hashCode() {
-		return getName().hashCode() + getElementType().hashCode();
+		return toString().hashCode();
 	}
 
 	@Override
@@ -70,7 +74,6 @@ abstract public class Element {
 			return false;
 
 		Element thatElement = (Element) that;
-
-		return getName().equals(thatElement.getName()) && getElementType().equals(thatElement.getElementType());
+		return this.toString().equals(thatElement.toString());
 	}
 }

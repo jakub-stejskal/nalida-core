@@ -18,6 +18,11 @@ public class Attribute extends Element {
 		return ElementType.ATTRIBUTE;
 	}
 
+	@Override
+	public String getLongName() {
+		return toEntityElement().getName() + "." + getName();
+	}
+
 	public Entity getTypeEntity() {
 		return this.typeEntity;
 	}
@@ -58,10 +63,5 @@ public class Attribute extends Element {
 
 	public List<String> getTokens() {
 		return this.tokens;
-	}
-
-	@Override
-	public String toString() {
-		return getElementType() + "/" + toEntityElement().getName() + "." + getName();
 	}
 }

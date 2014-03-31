@@ -12,7 +12,7 @@ public class Subresource extends Attribute {
 	}
 
 	@Override
-	public String toString() {
-		return getElementType() + "/" + getParent().getName() + "." + getName();
+	public String getLongName() {
+		return getParent().getName() + "." + getName();
 	}
 }

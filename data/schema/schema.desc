@@ -2,7 +2,7 @@ version: 1.0
 
 schema:
   - name: Teacher
-    resource: /teachers
+    resource: teachers/
     attributes:
       - name:   username
         type:   string
@@ -23,12 +23,12 @@ schema:
         type:   string
         tokens: [supervision]
     subresources:
-      - name:   /courses
+      - name:   courses
         type:   Course
         tokens: [teach]
 
   - name: Course
-    resource: /courses
+    resource: courses/
     attributes:
       - name:   name
         type:   string
@@ -44,7 +44,7 @@ schema:
         tokens: [department]
 
   - name: Division
-    resource: /divisions
+    resource: divisions/
     attributes:
       - name:   name
         type:   string
@@ -53,12 +53,12 @@ schema:
         type:   string
         tokens: [code]
     subresources:
-      - name:   /teachers
+      - name:   teachers
         type:   Teacher
         tokens: [employ]
-      - name:   /courses
+      - name:   courses
         type:   Course
         tokens: [teach, manage]
-      - name:   /subdivisions
+      - name:   subdivisions
         type:   Division
         tokens: [subdivision]

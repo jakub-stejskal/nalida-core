@@ -28,7 +28,7 @@ public class Value extends Element {
 	}
 
 	@Override
-	public String toString() {
-		return getElementType() + "/" + toEntityElement().getName() + "." + getName();
+	public String getLongName() {
+		return toEntityElement().getName() + "." + getName();
 	}
 }
