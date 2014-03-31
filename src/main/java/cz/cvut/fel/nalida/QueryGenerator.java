@@ -18,9 +18,7 @@ import cz.cvut.fel.nalida.db.Schema;
 
 public class QueryGenerator {
 
-	@SuppressWarnings("unused")
-	// TODO Will it be used here?
-	private final Schema schema;
+	protected final Schema schema;
 	private final Properties props;
 
 	public QueryGenerator(Schema schema, Properties props) throws FileNotFoundException, IOException {

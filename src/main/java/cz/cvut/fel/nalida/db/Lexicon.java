@@ -14,8 +14,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.yaml.snakeyaml.Yaml;
-
 import com.google.common.collect.Sets;
 
 import cz.cvut.fel.nalida.Lemmatizer;
@@ -40,7 +38,7 @@ public class Lexicon {
 
 	private Schema loadSchema(String schemaPath) throws FileNotFoundException {
 		InputStream input = new FileInputStream(new File(schemaPath + SCHEMA_FILENAME));
-		return new Yaml().loadAs(input, Schema.class).linkReferences();
+		return Schema.load(input);
 	}
 
 	private void loadLexicon(String schemaPath) throws IOException {

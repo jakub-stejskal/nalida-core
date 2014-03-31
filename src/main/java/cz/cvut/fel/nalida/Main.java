@@ -12,7 +12,6 @@ import java.util.Set;
 
 import cz.cvut.fel.nalida.db.Lexicon;
 import cz.cvut.fel.nalida.db.QueryPlan;
-import cz.cvut.fel.nalida.db.XmlParser;
 import cz.cvut.fel.nalida.stanford.SemanticAnnotator;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
@@ -27,6 +26,7 @@ import edu.stanford.nlp.util.CoreMap;
 public class Main {
 
 	private static final String QUERIES_FILE = "data/dev.txt";
+	private static final boolean GENERATE_SQL = true;
 	static Scanner in = new Scanner(System.in);
 
 	private static SyntacticAnalysis syntacticAnalysis;
@@ -71,7 +71,8 @@ public class Main {
 				System.out.println();
 				try {
 					for (String queryResult : queryPlan.execute()) {
-						System.out.println(new XmlParser(queryResult).toString());
+						//						System.out.println(new XmlParser(queryResult).toString());
+						System.out.println(queryResult);
 					}
 				} catch (Exception e) {
 					e.printStackTrace(System.out);
@@ -96,7 +97,11 @@ public class Main {
 		Properties props = new Properties();
 		props.load(Main.class.getClassLoader().getResourceAsStream("db.properties"));
 
-		queryGenerator = new QueryGenerator(lexicon.getSchema(), props);
+		if (GENERATE_SQL) {
+			queryGenerator = new SqlQueryGenerator(lexicon.getSchema(), props);
+		} else {
+			queryGenerator = new QueryGenerator(lexicon.getSchema(), props);
+		}
 	}
 
 	private static Tokenization pickTokenization(Set<Tokenization> tokenizations) throws IOException {
