@@ -2,92 +2,33 @@ package cz.cvut.fel.nalida;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import com.google.common.collect.Iterables;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.KShortestPaths;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.DirectedWeightedMultigraph;
 
-import cz.cvut.fel.nalida.db.Attribute;
 import cz.cvut.fel.nalida.db.Element;
 import cz.cvut.fel.nalida.db.Element.ElementType;
 import cz.cvut.fel.nalida.db.Entity;
-import cz.cvut.fel.nalida.db.QueryBuilder;
 import cz.cvut.fel.nalida.db.QueryPlan;
 import cz.cvut.fel.nalida.db.Schema;
 
-public class QueryGenerator {
-
+abstract public class QueryGenerator {
 	protected final Schema schema;
-	private final Properties props;
+	protected final Properties props;
 
 	public QueryGenerator(Schema schema, Properties props) throws FileNotFoundException, IOException {
 		this.schema = schema;
 		this.props = props;
 	}
 
-	public QueryPlan generateQuery(Tokenization tokenization) {
-		QueryPlan queryPlan = new QueryPlan();
-
-		Set<Element> projections = getProjectionElements(tokenization);
-		Set<Token> constraints = getConstraintElements(tokenization);
-
-		Set<Entity> resultEntities = new HashSet<>();
-		for (Element projElement : projections) {
-			resultEntities.add(projElement.toEntityElement());
-		}
-		if (resultEntities.size() > 1) {
-			throw new UnsupportedOperationException("Multi-entity projections not supported.");
-		}
-
-		Entity resultEntity = getResource(resultEntities);
-
-		Set<Entity> constraintEntities = new HashSet<>();
-		Set<Token> constraintTokens = new HashSet<>();
-		for (Token constrToken : constraints) {
-			if (constrToken.getEntityElement() != resultEntity) {
-				constraintTokens.add(constrToken);
-				constraintEntities.add(constrToken.getEntityElement());
-			}
-		}
-		if (constraintEntities.size() > 1) {
-			throw new UnsupportedOperationException("Multiple non-result constraint entities not supported.");
-		}
-
-		else if (constraintEntities.size() == 1) {
-			Entity constraintEntity = constraintEntities.iterator().next();
-			QueryBuilder qb = new QueryBuilder(this.props);
-			qb.resource(constraintEntity.getResource());
-
-			//			for (Element projElement : projections) {
-			//				qb.projection(getProjectionLabel(projElement, resultEntity));
-			//			}
-
-			for (Token token : constraintTokens) {
-				String attribute = getResourceConstraintLabel(constraintEntity, token.getElement());
-				qb.constraint(attribute, "==", Iterables.toArray(token.getWords(), String.class));
-			}
-
-			queryPlan.addQuery(qb.build());
-		}
-
-		QueryBuilder qb = new QueryBuilder(this.props);
-		qb.resource(resultEntity.getResource());
-
-		for (Element projElement : projections) {
-			qb.projection(getProjectionLabel(projElement, resultEntity));
-		}
-
-		for (Token token : constraints) {
-			if (token.getEntityElement() != constraintEntities.iterator().next()) {
-				String attribute = getResourceConstraintLabel(resultEntity, token.getElement());
-				qb.constraint(attribute, "==", Iterables.toArray(token.getWords(), String.class));
-			}
-		}
-
-		queryPlan.addQuery(qb.build());
-		return queryPlan;
-	}
+	abstract public QueryPlan generateQuery(Tokenization tokenization);
 
 	protected Set<Element> getProjectionElements(Tokenization tokenization) {
 		Token whToken = tokenization.getTokens(ElementType.WH_WORD).iterator().next();
@@ -112,32 +53,67 @@ public class QueryGenerator {
 		return new HashSet<>(tokenization.getTokens(ElementType.VALUE));
 	}
 
-	private String getResourceConstraintLabel(Entity resultEntity, Element constraintElement) {
-		Entity constraintEntity = constraintElement.toEntityElement();
-		if (constraintEntity.equals(resultEntity)) {
-			return constraintElement.getName();
+	protected Entity getProjectionEntity(Set<Element> projections) {
+		Set<Entity> resultEntities = new HashSet<>();
+		for (Element projElement : projections) {
+			resultEntities.add(projElement.toEntityElement());
 		}
-		for (Attribute resourceAttribute : resultEntity.getAttributes()) {
-			if (resourceAttribute.getType().equals(constraintEntity.getName())) {
-				return resourceAttribute.getName() + "." + constraintElement.getName();
+		if (resultEntities.size() > 1) {
+			throw new UnsupportedOperationException("Multi-entity projections not supported.");
+		}
+
+		return resultEntities.iterator().next();
+	}
+
+	protected Entity getConstraintEntity(Set<Token> constraints, Entity projectionEntity) {
+		Set<Entity> constraintEntities = new HashSet<>();
+		for (Token constrToken : constraints) {
+			if (constrToken.getEntityElement() != projectionEntity) {
+				constraintEntities.add(constrToken.getEntityElement());
 			}
 		}
-
-		throw new UnsupportedOperationException("Result entity " + resultEntity.getName() + " and constraint entity "
-				+ constraintEntity.getName() + " not connected.");
+		if (constraintEntities.size() > 1) {
+			throw new UnsupportedOperationException("Multiple non-result constraint entities not supported.");
+		} else if (constraintEntities.size() == 0) {
+			return projectionEntity;
+		}
+		return constraintEntities.iterator().next();
 	}
 
-	private String getProjectionLabel(Element element, Entity resourceEntity) {
-		if (element.equals(resourceEntity)) {
-			return null;
+	protected List<DefaultWeightedEdge> getShortestPath(Tokenization tokenization, Entity projEntity, Entity constrEntity) {
+		if (projEntity.equals(constrEntity)) {
+			return Collections.emptyList();
 		}
-		if (element.isElementType(ElementType.ATTRIBUTE) && element.toEntityElement().equals(resourceEntity)) {
-			return "content/" + element.getName();
+		DirectedWeightedMultigraph<Element, DefaultWeightedEdge> graph = this.schema.getGraph();
+		KShortestPaths<Element, DefaultWeightedEdge> paths = new KShortestPaths<>(graph, constrEntity, 5);
+		List<Element> tokenizationElements = tokenization.getElements();
+		Set<Entity> entities = getEntityElements(tokenization);
+
+		double minPathWeight = Double.MAX_VALUE;
+		List<DefaultWeightedEdge> minPath = null;
+		for (GraphPath<Element, DefaultWeightedEdge> path : paths.getPaths(projEntity)) {
+			double pathWeight = 0;
+			for (DefaultWeightedEdge e : path.getEdgeList()) {
+				boolean sourceInTokens = isInTokens(graph.getEdgeSource(e), tokenizationElements, entities);
+				boolean targetInTokens = isInTokens(graph.getEdgeTarget(e), tokenizationElements, entities);
+
+				if (!(sourceInTokens && targetInTokens)) {
+					pathWeight += graph.getEdgeWeight(e);
+				}
+			}
+			if (pathWeight < minPathWeight) {
+				minPathWeight = pathWeight;
+				minPath = path.getEdgeList();
+			}
 		}
-		return "content/" + element.getName(); // TODO deal with non-resource projections
+		return minPath;
 	}
 
-	private Entity getResource(Set<Entity> entities) {
-		return entities.iterator().next();
+	private boolean isInTokens(Element edgeNode, List<Element> tokenizationElements, Set<Entity> entities) {
+		if (edgeNode.isElementType(ElementType.ENTITY)) {
+			return entities.contains(edgeNode);
+		} else {
+			return tokenizationElements.contains(edgeNode);
+		}
 	}
 }

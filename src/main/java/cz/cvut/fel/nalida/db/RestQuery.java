@@ -101,7 +101,7 @@ public class RestQuery implements Query {
 			throw new Exception("Failed : HTTP error code : " + response.getStatus() + " - " + response.getStatusInfo() + ", URL:"
 					+ this.webResource.getURI());
 		}
-		return response.getEntity(String.class);
+		return new XmlParser(response.getEntity(String.class)).toString();
 	}
 
 	@Override

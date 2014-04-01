@@ -5,11 +5,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
 
+import cz.cvut.fel.nalida.db.GraphDisplay;
 import cz.cvut.fel.nalida.db.Lexicon;
 import cz.cvut.fel.nalida.db.QueryPlan;
 import cz.cvut.fel.nalida.stanford.SemanticAnnotator;
@@ -26,7 +29,8 @@ import edu.stanford.nlp.util.CoreMap;
 public class Main {
 
 	private static final String QUERIES_FILE = "data/dev.txt";
-	private static final boolean GENERATE_SQL = true;
+	private static final boolean GENERATE_SQL = false;
+	private static final boolean VISUALIZE_SCHEMA = false;
 	static Scanner in = new Scanner(System.in);
 
 	private static SyntacticAnalysis syntacticAnalysis;
@@ -71,7 +75,6 @@ public class Main {
 				System.out.println();
 				try {
 					for (String queryResult : queryPlan.execute()) {
-						//						System.out.println(new XmlParser(queryResult).toString());
 						System.out.println(queryResult);
 					}
 				} catch (Exception e) {
@@ -90,6 +93,9 @@ public class Main {
 		properties.load(Main.class.getClassLoader().getResourceAsStream("nlpcore.properties"));
 
 		lexicon = new Lexicon("data/schema/");
+		if (VISUALIZE_SCHEMA) {
+			GraphDisplay.displayGraph(lexicon.getSchema().getGraph());
+		}
 
 		syntacticAnalysis = new SyntacticAnalysis(properties, lexicon);
 		semanticAnalysis = new SemanticAnalysis(lexicon);
@@ -100,7 +106,7 @@ public class Main {
 		if (GENERATE_SQL) {
 			queryGenerator = new SqlQueryGenerator(lexicon.getSchema(), props);
 		} else {
-			queryGenerator = new QueryGenerator(lexicon.getSchema(), props);
+			queryGenerator = new RestQueryGenerator(lexicon.getSchema(), props);
 		}
 	}
 
@@ -111,9 +117,16 @@ public class Main {
 		}
 
 		List<Tokenization> tokList = new ArrayList<>(tokenizations);
+		Collections.sort(tokList, new Comparator<Tokenization>() {
+			@Override
+			public int compare(Tokenization o1, Tokenization o2) {
+				return o1.getTokens().toString().compareTo(o2.getTokens().toString());
+			}
+		});
+
 		System.out.println("Choose correct tokenization:");
 		for (int i = 0; i < tokList.size(); i++) {
-			System.out.println(i + ": " + tokList.get(i).getTokens());
+			System.out.println(i + ": " + tokList.get(i).getTokens() + "(" + i + ")");
 		}
 
 		int choice = in.nextInt();

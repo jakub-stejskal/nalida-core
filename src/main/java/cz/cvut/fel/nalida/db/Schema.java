@@ -103,15 +103,11 @@ public final class Schema {
 				if (!attribute.isPrimitiveType()) {
 					this.graph.addVertex(attribute);
 					this.graph.setEdgeWeight(this.graph.addEdge(entity, attribute), DIRECT_EDGE_WEIGHT);
-					this.graph.setEdgeWeight(this.graph.addEdge(attribute, entity), DIRECT_EDGE_WEIGHT);
-
 					Entity type = attribute.getTypeEntity();
 					this.graph.setEdgeWeight(this.graph.addEdge(attribute, type), UNDIRECT_EDGE_WEIGHT);
-					this.graph.setEdgeWeight(this.graph.addEdge(type, attribute), UNDIRECT_EDGE_WEIGHT);
+
 				}
 			}
 		}
-
-		GraphDisplay.displayGraph(this.graph);
 	}
 }

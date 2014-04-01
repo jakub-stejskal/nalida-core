@@ -30,7 +30,7 @@ public class QueryBuilder {
 
 		this.webResource = client.resource(baseUrl);
 
-		this.resource = "";
+		this.resource = null;
 		this.projection = new HashSet<>();
 		this.constraints = new HashMap<>();
 	}
@@ -41,7 +41,9 @@ public class QueryBuilder {
 	}
 
 	public QueryBuilder resource(String resource) {
-		this.resource = resource;
+		if (this.resource == null) {
+			this.resource = resource;
+		}
 		return this;
 	}
 

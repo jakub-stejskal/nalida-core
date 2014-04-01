@@ -1,5 +1,6 @@
 package cz.cvut.fel.nalida;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Set;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
+import cz.cvut.fel.nalida.db.Element;
 import cz.cvut.fel.nalida.db.Element.ElementType;
 
 public class Tokenization {
@@ -44,6 +46,22 @@ public class Tokenization {
 				return token.getElementType() == type;
 			}
 		});
+	}
+
+	public List<Element> getElements() {
+		List<Element> elements = new ArrayList<>();
+		for (Token token : getTokens()) {
+			elements.add(token.getElement());
+		}
+		return elements;
+	}
+
+	public List<Element> getElements(final ElementType type) {
+		List<Element> elements = new ArrayList<>();
+		for (Token token : getTokens(type)) {
+			elements.add(token.getElement());
+		}
+		return elements;
 	}
 
 	public Set<Token> getAttached(Token token) {

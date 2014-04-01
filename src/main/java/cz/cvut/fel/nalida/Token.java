@@ -11,15 +11,6 @@ public class Token {
 	protected Element element;
 	protected Set<Element> elements;
 
-	//
-	//	public Token(ElementType elementType, String elementName) {
-	//		this(null, elementType, elementName);
-	//	}
-	//
-	//	public Token(Set<String> words, Token token) {
-	//		this(words, token.elementType, token.elementName);
-	//	}
-	//
 	public Token(Set<String> words, Element element) {
 		super();
 		this.words = words;

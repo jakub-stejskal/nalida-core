@@ -7,11 +7,6 @@ public class Subresource extends Attribute {
 	}
 
 	@Override
-	public Entity toEntityElement() {
-		return getTypeEntity();
-	}
-
-	@Override
 	public String getLongName() {
 		return getParent().getName() + "." + getName();
 	}

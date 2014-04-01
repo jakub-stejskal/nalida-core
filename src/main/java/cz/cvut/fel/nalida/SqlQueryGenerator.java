@@ -2,13 +2,11 @@ package cz.cvut.fel.nalida;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 
@@ -72,34 +70,22 @@ public class SqlQueryGenerator extends QueryGenerator {
 	}
 
 	private Set<String> getJoinConstraints(Tokenization tokenization) {
-		Set<Entity> projEntities = new HashSet<>();
-		for (Element projElement : getProjectionElements(tokenization)) {
-			projEntities.add(projElement.toEntityElement());
-		}
-		Set<Entity> constrEntities = new HashSet<>();
-		for (Token constrElement : getConstraintElements(tokenization)) {
-			constrEntities.add(constrElement.getEntityElement());
-		}
+		Set<Element> projections = getProjectionElements(tokenization);
+		Set<Token> constraints = getConstraintElements(tokenization);
+		Entity projectionEntity = getProjectionEntity(projections);
+		Entity constraintEntity = getConstraintEntity(constraints, projectionEntity);
 
-		if (projEntities.size() == 1 && constrEntities.size() == 1) {
-			DirectedWeightedMultigraph<Element, DefaultWeightedEdge> g = this.schema.getGraph();
-			Entity projElement = projEntities.iterator().next();
-			Entity constrElement = constrEntities.iterator().next();
-
-			List<DefaultWeightedEdge> path = DijkstraShortestPath.findPathBetween(g, constrElement, projElement);
-			System.out.println("PATH: " + path);
-
-			return getJoins(g, path);
-		}
-
-		return Collections.emptySet();
+		List<DefaultWeightedEdge> path = getShortestPath(tokenization, projectionEntity, constraintEntity);
+		System.out.println("PATH: " + path);
+		return getJoins(path);
 	}
 
-	private Set<String> getJoins(DirectedWeightedMultigraph<Element, DefaultWeightedEdge> g, List<DefaultWeightedEdge> path) {
+	private Set<String> getJoins(List<DefaultWeightedEdge> path) {
+		DirectedWeightedMultigraph<Element, DefaultWeightedEdge> graph = this.schema.getGraph();
 		HashSet<String> joins = new HashSet<String>();
 		for (DefaultWeightedEdge edge : path) {
-			Element source = g.getEdgeSource(edge);
-			Element target = g.getEdgeTarget(edge);
+			Element source = graph.getEdgeSource(edge);
+			Element target = graph.getEdgeTarget(edge);
 			if (!source.toEntityElement().equals(target.toEntityElement())) {
 				joins.add(elementString(source) + "=" + elementString(target));
 			}
