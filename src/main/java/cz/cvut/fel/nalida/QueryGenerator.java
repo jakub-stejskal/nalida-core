@@ -18,6 +18,7 @@ import cz.cvut.fel.nalida.db.Element.ElementType;
 import cz.cvut.fel.nalida.db.Entity;
 import cz.cvut.fel.nalida.db.QueryPlan;
 import cz.cvut.fel.nalida.db.Schema;
+import cz.cvut.fel.nalida.db.Subresource;
 
 abstract public class QueryGenerator {
 	protected final Schema schema;
@@ -56,7 +57,11 @@ abstract public class QueryGenerator {
 	protected Entity getProjectionEntity(Set<Element> projections) {
 		Set<Entity> resultEntities = new HashSet<>();
 		for (Element projElement : projections) {
-			resultEntities.add(projElement.toEntityElement());
+			if (projElement.isElementType(ElementType.SUBRESOURCE)) {
+				resultEntities.add(((Subresource) projElement).getTypeEntity());
+			} else {
+				resultEntities.add(projElement.toEntityElement());
+			}
 		}
 		if (resultEntities.size() > 1) {
 			throw new UnsupportedOperationException("Multi-entity projections not supported.");

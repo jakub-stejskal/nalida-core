@@ -68,7 +68,13 @@ public final class Schema {
 			for (Attribute attribute : entity.getAttributes()) {
 				attribute.parent = entity;
 				if (!attribute.isPrimitiveType()) {
-					attribute.setTypeEntity(entityNames.get(attribute.getType()));
+					String typeName = attribute.getType();
+					if (attribute.isCollectionType()) {
+						String typeNameWithoutStar = typeName.substring(0, typeName.length() - 1);
+						attribute.setTypeEntity(entityNames.get(typeNameWithoutStar));
+					} else {
+						attribute.setTypeEntity(entityNames.get(attribute.getType()));
+					}
 				}
 			}
 			for (Attribute attribute : entity.getSubresources()) {
@@ -90,22 +96,23 @@ public final class Schema {
 		for (Entity entity : this.schema) {
 			for (Attribute attribute : entity.getAttributes()) {
 				if (!attribute.isPrimitiveType()) {
+					Entity type = attribute.getTypeEntity();
 					this.graph.addVertex(attribute);
 					this.graph.setEdgeWeight(this.graph.addEdge(entity, attribute), DIRECT_EDGE_WEIGHT);
-					this.graph.setEdgeWeight(this.graph.addEdge(attribute, entity), DIRECT_EDGE_WEIGHT);
-
-					Entity type = attribute.getTypeEntity();
 					this.graph.setEdgeWeight(this.graph.addEdge(attribute, type), UNDIRECT_EDGE_WEIGHT);
-					this.graph.setEdgeWeight(this.graph.addEdge(type, attribute), DIRECT_EDGE_WEIGHT);
+
+					if (!attribute.isCollectionType()) {
+						this.graph.setEdgeWeight(this.graph.addEdge(attribute, entity), DIRECT_EDGE_WEIGHT);
+						this.graph.setEdgeWeight(this.graph.addEdge(type, attribute), DIRECT_EDGE_WEIGHT);
+					}
 				}
 			}
 			for (Attribute attribute : entity.getSubresources()) {
 				if (!attribute.isPrimitiveType()) {
+					Entity type = attribute.getTypeEntity();
 					this.graph.addVertex(attribute);
 					this.graph.setEdgeWeight(this.graph.addEdge(entity, attribute), DIRECT_EDGE_WEIGHT);
-					Entity type = attribute.getTypeEntity();
 					this.graph.setEdgeWeight(this.graph.addEdge(attribute, type), UNDIRECT_EDGE_WEIGHT);
-
 				}
 			}
 		}

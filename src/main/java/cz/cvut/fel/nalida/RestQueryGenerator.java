@@ -67,14 +67,13 @@ public class RestQueryGenerator extends QueryGenerator {
 					Entity entity = (Entity) target;
 					if (attribute.toEntityElement().equals(entity)) {
 						//TODO maybe nothing to do here?
-
 					} else {
 						query.resource("");
 					}
 				} else {
 					throw new UnsupportedOperationException("Unsupported connection: " + edge);
 				}
-			} else if (target.isElementType(ElementType.SUBRESOURCE)) {
+			} else if (source.isElementType(ElementType.SUBRESOURCE)) {
 				//TODO
 			} else {
 				//TODO
@@ -84,7 +83,7 @@ public class RestQueryGenerator extends QueryGenerator {
 		query.resource(projectionEntity.getResource());
 		addConstraints(query, "", projectionEntity, constraints);
 		for (Element projElement : projections) {
-			if (!projElement.equals(projectionEntity)) {
+			if (projElement.isElementType(ElementType.ATTRIBUTE)) {
 				query.projection("content/" + projElement.getName());
 			}
 		}

@@ -18,14 +18,14 @@ schema:
         tokens: [phone, number]
       - name:   division
         type:   Division
-        tokens: [division, department]
+        tokens: [division, department, work, employ]
       - name:   supervisionPhDStudents
         type:   string
         tokens: [supervision]
     subresources:
       - name:   courses
         type:   Course
-        tokens: [teach]
+        tokens: [teach, course]
 
   - name: Course
     resource: courses/
@@ -41,7 +41,10 @@ schema:
         tokens: [credit]
       - name:   department
         type:   Division
-        tokens: [department]
+        tokens: [division, department, teach, manage]
+      - name:   instance/lecturers/teacher
+        type:   Teacher*
+        tokens: [lecturer, lecture]
 
   - name: Division
     resource: divisions/

@@ -53,6 +53,10 @@ public class Attribute extends Element {
 		return this.type.equals("string") || this.type.equals("integer");
 	}
 
+	public boolean isCollectionType() {
+		return this.type.endsWith("*");
+	}
+
 	public Value getValueElement() {
 		return this.valueElement;
 	}
