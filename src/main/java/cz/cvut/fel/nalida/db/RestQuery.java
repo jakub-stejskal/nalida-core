@@ -116,7 +116,7 @@ public class RestQuery implements Query {
 				query = "//entry/link/@href";
 			} else {
 				String idAttr = this.projection.iterator().next();
-				query = "//content/" + idAttr + "/@href";
+				query = "//" + idAttr + "/@href";
 			}
 
 			List<String> results = coursesDoc.query(query);

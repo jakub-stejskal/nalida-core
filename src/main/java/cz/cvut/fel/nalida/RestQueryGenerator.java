@@ -50,7 +50,6 @@ public class RestQueryGenerator extends QueryGenerator {
 						plan.addQuery(query.build());
 						query = new QueryBuilder(this.props);
 					} else {
-						//						query.resource(attribute.toEntityElement().getResource());
 						addConstraints(query, attribute.getName() + ".", entity, constraints);
 					}
 				} else if (target.isElementType(ElementType.SUBRESOURCE)) {
@@ -66,17 +65,15 @@ public class RestQueryGenerator extends QueryGenerator {
 				if (target.isElementType(ElementType.ENTITY)) {
 					Entity entity = (Entity) target;
 					if (attribute.toEntityElement().equals(entity)) {
-						//TODO maybe nothing to do here?
 					} else {
 						query.resource("");
+						query.collection(false);
 					}
 				} else {
 					throw new UnsupportedOperationException("Unsupported connection: " + edge);
 				}
 			} else if (source.isElementType(ElementType.SUBRESOURCE)) {
-				//TODO
 			} else {
-				//TODO
 			}
 		}
 
