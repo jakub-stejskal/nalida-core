@@ -1,23 +1,22 @@
 package cz.cvut.fel.nalida;
 
-import java.util.Set;
+import java.util.List;
 
 import cz.cvut.fel.nalida.db.Element;
 import cz.cvut.fel.nalida.db.Element.ElementType;
 import cz.cvut.fel.nalida.db.Entity;
 
 public class Token {
-	protected Set<String> words;
+	protected List<String> words;
 	protected Element element;
-	protected Set<Element> elements;
 
-	public Token(Set<String> words, Element element) {
+	public Token(List<String> words, Element element) {
 		super();
 		this.words = words;
 		this.element = element;
 	}
 
-	public Set<String> getWords() {
+	public List<String> getWords() {
 		return this.words;
 	}
 
@@ -52,6 +51,11 @@ public class Token {
 	}
 
 	@Override
+	public int hashCode() {
+		return this.words.hashCode() + this.element.hashCode();
+	}
+
+	@Override
 	public boolean equals(Object that) {
 		if (this == that)
 			return true;
@@ -60,7 +64,6 @@ public class Token {
 			return false;
 
 		Token thatToken = (Token) that;
-
 		return this.words.equals(thatToken.words) && this.element.equals(thatToken.element);
 	}
 }

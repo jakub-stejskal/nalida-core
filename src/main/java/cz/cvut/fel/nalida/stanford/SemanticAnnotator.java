@@ -1,7 +1,9 @@
 package cz.cvut.fel.nalida.stanford;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -47,9 +49,23 @@ public class SemanticAnnotator implements Annotator, CoreAnnotation<Set<Token>> 
 	public void annotate(Annotation annotation) {
 		if (annotation.containsKey(TokensAnnotation.class)) {
 			List<CoreLabel> tokens = annotation.get(TokensAnnotation.class);
+			List<String> lemmas = new ArrayList<>();
 			for (CoreLabel token : tokens) {
-				String lemma = token.lemma();
-				token.set(SemanticAnnotator.class, this.lexicon.getSemSet(lemma));
+				lemmas.add(token.lemma().toLowerCase());
+			}
+			for (CoreLabel token : tokens) {
+				Set<Token> compatibleTokens = new HashSet<>();
+				Set<Token> semSet = this.lexicon.getSemSet(token.lemma());
+				if (semSet == null) {
+					compatibleTokens = null;
+				} else {
+					for (Token t : semSet) {
+						if (lemmas.containsAll(t.getWords())) {
+							compatibleTokens.add(t);
+						}
+					}
+				}
+				token.set(SemanticAnnotator.class, compatibleTokens);
 			}
 		}
 

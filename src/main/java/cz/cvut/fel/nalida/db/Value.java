@@ -17,6 +17,10 @@ public class Value extends Element {
 		return getParent().getParent();
 	}
 
+	public Attribute getAttribute() {
+		return getParent();
+	}
+
 	@Override
 	protected Attribute getParent() {
 		return this.parent;

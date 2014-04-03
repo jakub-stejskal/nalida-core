@@ -17,6 +17,11 @@ abstract public class Element {
 		public Entity getParent() {
 			throw new UnsupportedOperationException("WhElement does not have parent");
 		}
+
+		@Override
+		public String toString() {
+			return getElementType().toString();
+		};
 	};
 
 	public enum ElementType {

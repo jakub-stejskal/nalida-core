@@ -76,7 +76,6 @@ public class RestQueryGenerator extends QueryGenerator {
 			} else {
 			}
 		}
-
 		query.resource(projectionEntity.getResource());
 		addConstraints(query, "", projectionEntity, constraints);
 		for (Element projElement : projections) {
@@ -85,11 +84,6 @@ public class RestQueryGenerator extends QueryGenerator {
 			}
 		}
 		plan.addQuery(query.build());
-
-		System.out.println("projec: " + projections);
-		System.out.println("constr: " + constraints);
-		System.out.println("path  : " + path);
-
 		return plan;
 	}
 

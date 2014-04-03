@@ -3,6 +3,7 @@ version: 1.0
 schema:
   - name: Teacher
     resource: teachers/
+    tokens: [teacher]
     attributes:
       - name:   username
         type:   string
@@ -29,6 +30,7 @@ schema:
 
   - name: Course
     resource: courses/
+    tokens: [course]
     attributes:
       - name:   name
         type:   string
@@ -48,6 +50,7 @@ schema:
 
   - name: Division
     resource: divisions/
+    tokens: [division, department]
     attributes:
       - name:   name
         type:   string

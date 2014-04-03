@@ -7,8 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
+import cz.cvut.fel.nalida.db.Attribute;
+import cz.cvut.fel.nalida.db.Element.ElementType;
 import cz.cvut.fel.nalida.db.Lexicon;
 import cz.cvut.fel.nalida.stanford.SemanticAnnotator;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
@@ -33,7 +36,7 @@ public class SemanticAnalysis {
 		Set<List<Token>> tokenLists = Sets.cartesianProduct(tokenSets);
 		Set<Tokenization> tokenizations = createTokenizations(annotatedLine, tokenLists, tokenIndices);
 
-		return tokenizations;
+		return validateTokenizations(annotatedLine, tokenizations);
 	}
 
 	private List<Set<Token>> createTokenSets(Annotation annotatedLine, Map<Integer, Integer> tokenIndices) {
@@ -79,4 +82,101 @@ public class SemanticAnalysis {
 
 		return tokenizations;
 	}
+
+	private Set<Tokenization> validateTokenizations(Annotation annotatedLine, Set<Tokenization> tokenizations) {
+		CoreMap sentence = annotatedLine.get(SentencesAnnotation.class).get(0);
+		SemanticGraph dependencyTree = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
+		List<CoreLabel> stanfordTokens = sentence.get(TokensAnnotation.class);
+		List<String> words = new ArrayList<>();
+		for (IndexedWord vertex : dependencyTree.vertexListSorted()) {
+			int index = vertex.index();
+			CoreLabel stanfordToken = stanfordTokens.get(index - 1);
+			if (stanfordToken.get(SemanticAnnotator.class) != null) {
+				words.add(vertex.lemma().toLowerCase());
+			}
+		}
+
+		Set<Tokenization> validTokenizations = new HashSet<>();
+		for (Tokenization tokenization : tokenizations) {
+			if (isValidTokenization(words, tokenization) && hasValidAttachments(tokenization)) {
+				validTokenizations.add(tokenization);
+			}
+		}
+		return validTokenizations;
+	}
+
+	private boolean isValidTokenization(List<String> words, Tokenization tokenization) {
+		ImmutableSet<Token> uniqueTokens = ImmutableSet.copyOf(tokenization.getTokens());
+		for (String word : words) {
+			int occurences = 0;
+			for (Token token : uniqueTokens) {
+				if (token.words.contains(word)) {
+					occurences++;
+				}
+			}
+			if (occurences != 1) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean hasValidAttachments(Tokenization tokenization) {
+		for (Token token : tokenization.getTokens()) {
+			boolean valid = false;
+			if (token.isType(ElementType.ENTITY)) {
+				for (Token attached : tokenization.getAttached(token)) {
+					if (attached.isType(ElementType.WH_WORD)
+							|| (attached.isType(ElementType.VALUE, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE) && attached
+									.getEntityElement().equals(token.getElement()))) {
+						valid = true;
+						break;
+					}
+				}
+			} else if (token.isType(ElementType.ATTRIBUTE, ElementType.SUBRESOURCE)) {
+				Attribute attribute = (Attribute) token.getElement();
+				for (Token attached : tokenization.getAttached(token)) {
+					if (attached.isType(ElementType.WH_WORD)
+							|| (attached.isType(ElementType.VALUE) && attached.getElement().equals(attribute.getValueElement()))
+							|| (attached.isType(ElementType.ENTITY, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE) && attached
+									.getElement().equals(attribute.getTypeEntity()))) {
+						valid = true;
+						break;
+					}
+				}
+			} else {
+				valid = true;
+			}
+			if (!valid) {
+				System.out.println("TOKENIZATION : " + tokenization);
+				System.out.println("FAILED TOKEN: " + token + " --- " + tokenization.getAttached(token));
+				return false;
+			}
+		}
+		return true;
+	}
+	//	private boolean hasValidAttachments(Tokenization tokenization) {
+	//		for (Attachment<Token> attachment : tokenization.getAttachments()) {
+	//			if (!attachment.source.isType(ElementType.WH_WORD) && !attachment.target.isType(ElementType.WH_WORD)
+	//					&& !attachment.source.getEntityElement().equals(attachment.target.getEntityElement())
+	//					&& !isAttributeOfType(attachment.source, attachment.target) && !isAttributeOfType(attachment.target, attachment.source)) {
+	//
+	//				System.out.println("TOKENIZATION : " + tokenization);
+	//				System.out.println("FAILED ATTACH: " + attachment);
+	//				return false;
+	//			}
+	//		}
+	//		return true;
+	//	}
+	//
+	//	private boolean isAttributeOfType(Token attrToken, Token type) {
+	//
+	//		if (attrToken.isType(ElementType.ATTRIBUTE, ElementType.SUBRESOURCE)) {
+	//			Attribute attribute = ((Attribute) attrToken.getElement());
+	//			if (!attribute.isPrimitiveType()) {
+	//				return attribute.getTypeEntity().equals(type.getEntityElement());
+	//			}
+	//		}
+	//		return false;
+	//	}
 }

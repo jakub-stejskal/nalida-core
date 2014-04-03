@@ -5,6 +5,7 @@ import java.util.List;
 
 public class Entity extends Element {
 	private String resource;
+	private List<String> tokens;
 	private List<Attribute> attributes = Collections.emptyList();
 	private List<Subresource> subresources = Collections.emptyList();
 
@@ -29,6 +30,14 @@ public class Entity extends Element {
 
 	public String getResource() {
 		return this.resource;
+	}
+
+	public void setTokens(List<String> tokens) {
+		this.tokens = tokens;
+	}
+
+	public List<String> getTokens() {
+		return this.tokens;
 	}
 
 	public void setAttributes(List<Attribute> attributes) {

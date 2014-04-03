@@ -11,10 +11,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 
 import cz.cvut.fel.nalida.Lemmatizer;
 import cz.cvut.fel.nalida.Token;
@@ -56,13 +57,14 @@ public class Lexicon {
 	}
 
 	private void loadEntity(Entity entity) {
-		String token = entity.getName().toLowerCase();
-		putToSemSet(token, entity);
+		for (String token : entity.getTokens()) {
+			putToSemSet(Lists.newArrayList(token), entity);
+		}
 	}
 
 	private void loadAttribute(Entity entity, Attribute attribute) {
 		for (String token : attribute.getTokens()) {
-			putToSemSet(token, attribute);
+			putToSemSet(Lists.newArrayList(token), attribute);
 		}
 	}
 
@@ -73,9 +75,8 @@ public class Lexicon {
 			BufferedReader br = new BufferedReader(new FileReader(valueFilename));
 			String line;
 			while ((line = br.readLine()) != null) {
-				for (String token : this.lemmatizer.getLemmas(line)) {
-					putToSemSet(token, attribute.getValueElement());
-				}
+				putToSemSet(this.lemmatizer.getLemmas(line), attribute.getValueElement());
+
 			}
 			br.close();
 		}
@@ -85,20 +86,22 @@ public class Lexicon {
 		String valueFilename = format("%s%s.%s.values", schemaPath, "common", "wh");
 
 		BufferedReader br = new BufferedReader(new FileReader(valueFilename));
-		String token;
-		while ((token = br.readLine()) != null) {
-			putToSemSet(token, Element.WH_ELEMENT);
+		String line;
+		while ((line = br.readLine()) != null) {
+			putToSemSet(this.lemmatizer.getLemmas(line), Element.WH_ELEMENT);
 		}
 		br.close();
 	}
 
-	private void putToSemSet(String lemma, Element element) {
-		Set<Token> tokenSet = this.lexicon.get(lemma);
-		if (tokenSet == null) {
-			tokenSet = new HashSet<>();
-			this.lexicon.put(lemma, tokenSet);
+	private void putToSemSet(List<String> words, Element element) {
+		for (String word : words) {
+			Set<Token> tokenSet = this.lexicon.get(word);
+			if (tokenSet == null) {
+				tokenSet = new HashSet<>();
+				this.lexicon.put(word, tokenSet);
+			}
+			tokenSet.add(new Token(words, element));
 		}
-		tokenSet.add(new Token(Sets.newHashSet(lemma), element));
 	}
 
 	public Set<Token> getSemSet(String lemma) {

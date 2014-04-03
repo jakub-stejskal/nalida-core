@@ -31,6 +31,7 @@ public class Main {
 	private static final String QUERIES_FILE = "data/dev.txt";
 	private static final boolean GENERATE_SQL = false;
 	private static final boolean VISUALIZE_SCHEMA = false;
+	private static final boolean EXECUTE_PLAN = false;
 	static Scanner in = new Scanner(System.in);
 
 	private static SyntacticAnalysis syntacticAnalysis;
@@ -68,17 +69,23 @@ public class Main {
 				Tokenization tokenization = pickTokenization(tokenizations);
 				System.out.println("Selected tokenization: ");
 				System.out.println(tokenization);
+				if (tokenization == null) {
+					continue;
+				}
 
 				QueryPlan queryPlan = queryGenerator.generateQuery(tokenization);
 				System.out.println("Generated query:");
 				System.out.println(queryPlan);
 				System.out.println();
-				try {
-					for (String queryResult : queryPlan.execute()) {
-						System.out.println(queryResult);
+
+				if (EXECUTE_PLAN) {
+					try {
+						for (String queryResult : queryPlan.execute()) {
+							System.out.println(queryResult);
+						}
+					} catch (Exception e) {
+						e.printStackTrace(System.out);
 					}
-				} catch (Exception e) {
-					e.printStackTrace(System.out);
 				}
 			} catch (Exception e) {
 				e.printStackTrace(System.out);
@@ -114,6 +121,8 @@ public class Main {
 		System.out.println("pickTokenization: " + tokenizations.size());
 		if (tokenizations.size() == 1) {
 			return tokenizations.iterator().next();
+		} else if (tokenizations.size() == 0) {
+			return null;
 		}
 
 		List<Tokenization> tokList = new ArrayList<>(tokenizations);
