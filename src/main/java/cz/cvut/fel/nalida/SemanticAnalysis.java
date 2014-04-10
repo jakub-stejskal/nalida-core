@@ -26,6 +26,8 @@ import edu.stanford.nlp.util.CoreMap;
 
 public class SemanticAnalysis {
 
+	private static final boolean VALIDATE_BY_TOKENS = false;
+
 	public SemanticAnalysis(Lexicon lexicon) {
 
 	}
@@ -46,6 +48,7 @@ public class SemanticAnalysis {
 		//		for (CoreMap sentence : sentences) {
 		List<CoreLabel> stanfordTokens = sentence.get(TokensAnnotation.class);
 		SemanticGraph dependencyTree = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
+
 		int position = 0;
 		for (IndexedWord vertex : dependencyTree.vertexListSorted()) {
 			int index = vertex.index();
@@ -76,8 +79,9 @@ public class SemanticAnalysis {
 		}
 
 		Set<Tokenization> tokenizations = new HashSet<>();
+		Integer root = tokenIndices.get(Integer.valueOf(dependencyTree.getFirstRoot().index()));
 		for (List<Token> tokenList : tokenLists) {
-			tokenizations.add(new Tokenization(tokenList, attachmentsTemplate));
+			tokenizations.add(new Tokenization(tokenList, root, attachmentsTemplate));
 		}
 
 		return tokenizations;
@@ -122,6 +126,14 @@ public class SemanticAnalysis {
 	}
 
 	private boolean hasValidAttachments(Tokenization tokenization) {
+		if (VALIDATE_BY_TOKENS) {
+			return hasValidAttachmentsByTokens(tokenization);
+		} else {
+			return hasValidAttachmentsByAttachments(tokenization);
+		}
+	}
+
+	private boolean hasValidAttachmentsByTokens(Tokenization tokenization) {
 		for (Token token : tokenization.getTokens()) {
 			boolean valid = false;
 			if (token.isType(ElementType.ENTITY)) {
@@ -155,28 +167,29 @@ public class SemanticAnalysis {
 		}
 		return true;
 	}
-	//	private boolean hasValidAttachments(Tokenization tokenization) {
-	//		for (Attachment<Token> attachment : tokenization.getAttachments()) {
-	//			if (!attachment.source.isType(ElementType.WH_WORD) && !attachment.target.isType(ElementType.WH_WORD)
-	//					&& !attachment.source.getEntityElement().equals(attachment.target.getEntityElement())
-	//					&& !isAttributeOfType(attachment.source, attachment.target) && !isAttributeOfType(attachment.target, attachment.source)) {
-	//
-	//				System.out.println("TOKENIZATION : " + tokenization);
-	//				System.out.println("FAILED ATTACH: " + attachment);
-	//				return false;
-	//			}
-	//		}
-	//		return true;
-	//	}
-	//
-	//	private boolean isAttributeOfType(Token attrToken, Token type) {
-	//
-	//		if (attrToken.isType(ElementType.ATTRIBUTE, ElementType.SUBRESOURCE)) {
-	//			Attribute attribute = ((Attribute) attrToken.getElement());
-	//			if (!attribute.isPrimitiveType()) {
-	//				return attribute.getTypeEntity().equals(type.getEntityElement());
-	//			}
-	//		}
-	//		return false;
-	//	}
+
+	private boolean hasValidAttachmentsByAttachments(Tokenization tokenization) {
+		for (Attachment<Token> attachment : tokenization.getAttachments()) {
+			if (!attachment.source.isType(ElementType.WH_WORD) && !attachment.target.isType(ElementType.WH_WORD)
+					&& !attachment.source.getEntityElement().equals(attachment.target.getEntityElement())
+					&& !isAttributeOfType(attachment.source, attachment.target) && !isAttributeOfType(attachment.target, attachment.source)) {
+
+				System.out.println("TOKENIZATION : " + tokenization);
+				System.out.println("FAILED ATTACH: " + attachment);
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isAttributeOfType(Token attrToken, Token type) {
+
+		if (attrToken.isType(ElementType.ATTRIBUTE, ElementType.SUBRESOURCE)) {
+			Attribute attribute = ((Attribute) attrToken.getElement());
+			if (!attribute.isPrimitiveType()) {
+				return attribute.getTypeEntity().equals(type.getEntityElement());
+			}
+		}
+		return false;
+	}
 }

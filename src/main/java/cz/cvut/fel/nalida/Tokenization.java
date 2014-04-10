@@ -15,10 +15,12 @@ import cz.cvut.fel.nalida.db.Element.ElementType;
 public class Tokenization {
 	final protected Set<Attachment<Token>> attachments;
 	final protected List<Token> tokens;
+	final protected Token root;
 
-	public Tokenization(List<Token> tokenList, Set<Attachment<Integer>> attachmentsTemplate) {
+	public Tokenization(List<Token> tokenList, Integer root, Set<Attachment<Integer>> attachmentsTemplate) {
 		this.tokens = tokenList;
 		this.attachments = createAttachments(attachmentsTemplate);
+		this.root = this.tokens.get(root.intValue());
 	}
 
 	private Set<Attachment<Token>> createAttachments(Set<Attachment<Integer>> attachmentsTemplate) {
@@ -37,6 +39,10 @@ public class Tokenization {
 
 	public List<Token> getTokens() {
 		return this.tokens;
+	}
+
+	public Token getRoot() {
+		return this.root;
 	}
 
 	public Collection<Token> getTokens(final ElementType type) {

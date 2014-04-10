@@ -16,7 +16,7 @@ schema:
         tokens: [name, surname]
       - name:   phone
         type:   string
-        tokens: [phone, number]
+        tokens: [phone, phone number]
       - name:   division
         type:   Division
         tokens: [division, department, work, employ]

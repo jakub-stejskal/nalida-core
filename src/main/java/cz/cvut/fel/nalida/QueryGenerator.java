@@ -2,6 +2,7 @@ package cz.cvut.fel.nalida;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +13,8 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.KShortestPaths;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
+
+import com.google.common.collect.Sets;
 
 import cz.cvut.fel.nalida.db.Element;
 import cz.cvut.fel.nalida.db.Element.ElementType;
@@ -32,12 +35,18 @@ abstract public class QueryGenerator {
 	abstract public QueryPlan generateQuery(Tokenization tokenization);
 
 	protected Set<Element> getProjectionElements(Tokenization tokenization) {
-		Token whToken = tokenization.getTokens(ElementType.WH_WORD).iterator().next();
-		Set<Element> elements = new HashSet<>();
-		for (Token token : tokenization.getAttached(whToken)) {
-			elements.add(token.getElement());
+
+		Collection<Token> whWordTokens = tokenization.getTokens(ElementType.WH_WORD);
+		if (whWordTokens.isEmpty()) {
+			return Sets.newHashSet(tokenization.getRoot().getElement());
+		} else {
+			Token whToken = tokenization.getTokens(ElementType.WH_WORD).iterator().next();
+			Set<Element> elements = new HashSet<>();
+			for (Token token : tokenization.getAttached(whToken)) {
+				elements.add(token.getElement());
+			}
+			return elements;
 		}
-		return elements;
 	}
 
 	protected Set<Entity> getEntityElements(Tokenization tokenization) {
