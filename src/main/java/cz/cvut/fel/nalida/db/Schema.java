@@ -14,16 +14,16 @@ import org.yaml.snakeyaml.Yaml;
 public final class Schema {
 	private static final int DIRECT_EDGE_WEIGHT = 1;
 	private static final double UNDIRECT_EDGE_WEIGHT = 1.1;
-	private String version;
+	private String baseUri;
 	private List<Entity> schema;
 	private DirectedWeightedMultigraph<Element, DefaultWeightedEdge> graph;
 
-	public String getVersion() {
-		return this.version;
+	public String getBaseUri() {
+		return this.baseUri;
 	}
 
-	public void setVersion(String version) {
-		this.version = version;
+	public void setBaseUri(String baseUri) {
+		this.baseUri = baseUri;
 	}
 
 	public List<Entity> getSchema() {
@@ -42,7 +42,7 @@ public final class Schema {
 	public String toString() {
 
 		StringBuilder sb = new StringBuilder();
-		sb.append(format("Version: %s\n", this.version));
+		sb.append(format("BaseUri: %s\n", this.baseUri));
 		sb.append(format("Schema: \n"));
 
 		for (Entity entity : this.schema) {

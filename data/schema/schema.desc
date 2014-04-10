@@ -1,4 +1,4 @@
-version: 1.0
+baseUri: https://kosapi.feld.cvut.cz/api/3/
 
 schema:
   - name: Teacher

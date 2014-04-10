@@ -23,6 +23,7 @@ public class RestQueryGenerator extends QueryGenerator {
 
 	public RestQueryGenerator(Schema schema, Properties props) throws FileNotFoundException, IOException {
 		super(schema, props);
+		props.put("baseUrl", schema.getBaseUri());
 	}
 
 	@Override

@@ -64,7 +64,7 @@ public class Lexicon {
 
 	private void loadAttribute(Entity entity, Attribute attribute) {
 		for (String token : attribute.getTokens()) {
-			putToSemSet(Lists.newArrayList(token), attribute);
+			putToSemSet(this.lemmatizer.getLemmas(token), attribute);
 		}
 	}
 
