@@ -18,7 +18,7 @@ public class QueryPlan {
 		List<String> queryResponse = Collections.emptyList();
 		for (Query query : this.queries) {
 			queryResponse = query.execute(queryParams);
-			queryParams = query.project(queryResponse);
+			queryParams = query.projectReference(queryResponse);
 		}
 		return queryResponse;
 	}

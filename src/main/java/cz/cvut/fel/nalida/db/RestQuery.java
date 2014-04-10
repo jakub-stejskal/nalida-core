@@ -25,12 +25,17 @@ public class RestQuery implements Query {
 	private final Set<String> projection;
 	private final Map<String, String> constraints;
 	private final boolean isCollection;
+	private final int offset;
+	private final int limit;
 
-	public RestQuery(WebResource entryPoint, String resource, Set<String> projection, Map<String, String> constraints, boolean isCollection) {
+	public RestQuery(WebResource entryPoint, String resource, Set<String> projection, Map<String, String> constraints,
+			boolean isCollection, int offset, int limit) {
 		this.resource = resource;
 		this.projection = projection;
 		this.constraints = constraints;
 		this.isCollection = isCollection;
+		this.offset = offset;
+		this.limit = limit;
 		this.webResource = entryPoint.queryParams(params());
 	}
 
@@ -51,7 +56,8 @@ public class RestQuery implements Query {
 		Map<String, List<String>> m = new HashMap<>();
 		m.put("lang", Lists.newArrayList("en"));
 		m.put("multilang", Lists.newArrayList("false"));
-		m.put("limit", Lists.newArrayList("100"));
+		m.put("limit", Lists.newArrayList(String.valueOf(this.limit)));
+		m.put("offset", Lists.newArrayList(String.valueOf(this.offset)));
 		m.put("sem", Lists.newArrayList("current,next"));
 		return m;
 	}
@@ -105,12 +111,10 @@ public class RestQuery implements Query {
 	}
 
 	@Override
-	public List<String> project(List<String> queryResponse) throws XPathExpressionException {
+	public List<String> projectReference(List<String> queryResponse) throws XPathExpressionException {
 		List<String> allResults = new ArrayList<>();
 		for (String responseElement : queryResponse) {
-
-			XmlParser coursesDoc = new XmlParser(responseElement);
-
+			XmlParser responseDoc = new XmlParser(responseElement);
 			String query;
 			if (this.projection.isEmpty()) {
 				query = "//entry/link/@href";
@@ -118,8 +122,25 @@ public class RestQuery implements Query {
 				String idAttr = this.projection.iterator().next();
 				query = "//" + idAttr + "/@href";
 			}
+			List<String> results = responseDoc.query(query);
+			allResults.addAll(results);
+		}
+		return allResults;
+	}
 
-			List<String> results = coursesDoc.query(query);
+	@Override
+	public List<String> projectContent(List<String> queryResponse) throws XPathExpressionException {
+		List<String> allResults = new ArrayList<>();
+		for (String responseElement : queryResponse) {
+			XmlParser responseDoc = new XmlParser(responseElement);
+			String query;
+			if (this.projection.isEmpty()) {
+				query = "//entry/title/text()";
+			} else {
+				String idAttr = this.projection.iterator().next();
+				query = "//" + idAttr + "/text()";
+			}
+			List<String> results = responseDoc.query(query);
 			allResults.addAll(results);
 		}
 		return allResults;

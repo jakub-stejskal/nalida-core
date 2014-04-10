@@ -18,6 +18,8 @@ public class QueryBuilder {
 	protected Set<String> projection;
 	protected Map<String, String> constraints;
 	boolean isCollection = true;
+	private int offset = 0;
+	private int limit = 100;
 
 	public QueryBuilder(Properties properties) {
 
@@ -58,8 +60,18 @@ public class QueryBuilder {
 		return this;
 	}
 
+	public QueryBuilder offset(int offset) {
+		this.offset = offset;
+		return this;
+	}
+
+	public QueryBuilder limit(int limit) {
+		this.limit = limit;
+		return this;
+	}
+
 	public Query build() {
-		return new RestQuery(this.webResource, this.resource, this.projection, this.constraints, this.isCollection);
+		return new RestQuery(this.webResource, this.resource, this.projection, this.constraints, this.isCollection, this.offset, this.limit);
 	}
 
 	@Override

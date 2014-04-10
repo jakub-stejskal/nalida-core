@@ -63,7 +63,13 @@ public class SqlQuery implements Query {
 	}
 
 	@Override
-	public List<String> project(List<String> queryResponse) throws XPathExpressionException {
+	public List<String> projectReference(List<String> queryResponse) throws XPathExpressionException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> projectContent(List<String> queryResponse) throws XPathExpressionException {
 		// TODO Auto-generated method stub
 		return null;
 	}

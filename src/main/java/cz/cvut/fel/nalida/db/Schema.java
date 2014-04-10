@@ -38,6 +38,15 @@ public final class Schema {
 		this.schema = schema;
 	}
 
+	public Entity getEntityByName(String name) {
+		for (Entity entity : this.schema) {
+			if (entity.getName().equals(name)) {
+				return entity;
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public String toString() {
 

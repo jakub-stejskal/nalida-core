@@ -10,6 +10,8 @@ public interface Query {
 
 	List<String> execute(List<String> queryParams) throws Exception;
 
-	List<String> project(List<String> queryResponse) throws XPathExpressionException;
+	List<String> projectReference(List<String> queryResponse) throws XPathExpressionException;
+
+	List<String> projectContent(List<String> queryResponse) throws XPathExpressionException;
 
 }

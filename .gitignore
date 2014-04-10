@@ -9,6 +9,7 @@
 /target
 /data/*.txt
 /data/schema/*.values
+/data/extracted
 
 /.project
 /.settings
