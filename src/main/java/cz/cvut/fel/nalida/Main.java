@@ -12,6 +12,14 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 import cz.cvut.fel.nalida.db.GraphDisplay;
 import cz.cvut.fel.nalida.db.Lexicon;
 import cz.cvut.fel.nalida.db.QueryPlan;
@@ -29,15 +37,14 @@ import edu.stanford.nlp.util.CoreMap;
 public class Main {
 
 	private static final String QUERIES_FILE = "data/dev.txt";
-	private static final boolean GENERATE_SQL = false;
 	private static final boolean VISUALIZE_SCHEMA = false;
-	private static final boolean EXECUTE_PLAN = false;
 	static Scanner in = new Scanner(System.in);
 
 	private static SyntacticAnalysis syntacticAnalysis;
 	private static SemanticAnalysis semanticAnalysis;
 	private static QueryGenerator queryGenerator;
 	private static Lexicon lexicon;
+	private static CommandLine cli;
 
 	/**
 	 * @param args
@@ -45,54 +52,91 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 
+		parseArguments(args);
 		initializeModules();
 
 		System.out.println(lexicon);
 
-		File file = new File(QUERIES_FILE);
-		BufferedReader br = new BufferedReader(new FileReader(file));
-		String line;
+		if (cli.hasOption("query")) {
+			processSentence(cli.getOptionValue("query"));
+		} else if (cli.hasOption("file") || cli.hasOption("example")) {
+			File file = null;
+			if (cli.hasOption("file")) {
+				file = new File(cli.getOptionValue("file"));
+			} else {
+				file = new File(QUERIES_FILE);
+			}
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			String line;
+			while ((line = br.readLine()) != null) {
+				try {
+					processSentence(line);
+				} catch (Exception e) {
+					e.printStackTrace(System.out);
+				}
+			}
+			br.close();
+			in.close();
+		}
+	}
 
-		while ((line = br.readLine()) != null) {
+	private static void parseArguments(String[] args) {
+		Options options = new Options();
+
+		OptionGroup optionGroup = new OptionGroup();
+		optionGroup.addOption(new Option("e", "example", false, "show example queries and their processing"));
+		optionGroup.addOption(new Option("q", "query", true, "process and answer the query from argument"));
+		optionGroup.addOption(new Option("f", "file", true, "process and answer each query from file"));
+		optionGroup.setRequired(true);
+		options.addOptionGroup(optionGroup);
+		options.addOption("d", "dry-run", false, "translate a query without executing it");
+		options.addOption("v", "verbose", false, "prints out detailed information about what is being done");
+		options.addOption("s", "sql", false, "translate a query into SQL instead of REST request");
+
+		try {
+			cli = new BasicParser().parse(options, args, true);
+		} catch (ParseException e) {
+			System.out.println(e.getMessage());
+			System.out.println();
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("-example | -file <queriesListFileName> | -query <query>", options);
+			System.exit(1);
+		}
+	}
+
+	private static void processSentence(String line) throws IOException {
+		if (line.isEmpty() || line.startsWith("#")) {
+			return;
+		}
+
+		System.out.println("\n XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
+		System.out.println(line);
+
+		Annotation annotatedLine = syntacticAnalysis.process(line);
+		//				printSyntacticInfo(annotatedLine);
+		Set<Tokenization> tokenizations = semanticAnalysis.getTokenizations(annotatedLine);
+		//			printSemanticInfo(tokenizations);
+		Tokenization tokenization = pickTokenization(tokenizations);
+		System.out.println("Selected tokenization: ");
+		System.out.println(tokenization);
+		if (tokenization == null) {
+			return;
+		}
+
+		QueryPlan queryPlan = queryGenerator.generateQuery(tokenization);
+		System.out.println("Generated query:");
+		System.out.println(queryPlan);
+		System.out.println();
+
+		if (!cli.hasOption("dry-run")) {
 			try {
-				if (line.isEmpty() || line.startsWith("#")) {
-					continue;
-				}
-
-				System.out.println("\n XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
-				System.out.println(line);
-
-				Annotation annotatedLine = syntacticAnalysis.process(line);
-				//			printSyntacticInfo(annotatedLine);
-				Set<Tokenization> tokenizations = semanticAnalysis.getTokenizations(annotatedLine);
-				//			printSemanticInfo(tokenizations);
-				Tokenization tokenization = pickTokenization(tokenizations);
-				System.out.println("Selected tokenization: ");
-				System.out.println(tokenization);
-				if (tokenization == null) {
-					continue;
-				}
-
-				QueryPlan queryPlan = queryGenerator.generateQuery(tokenization);
-				System.out.println("Generated query:");
-				System.out.println(queryPlan);
-				System.out.println();
-
-				if (EXECUTE_PLAN) {
-					try {
-						for (String queryResult : queryPlan.execute()) {
-							System.out.println(queryResult);
-						}
-					} catch (Exception e) {
-						e.printStackTrace(System.out);
-					}
+				for (String queryResult : queryPlan.execute()) {
+					System.out.println(queryResult);
 				}
 			} catch (Exception e) {
 				e.printStackTrace(System.out);
 			}
 		}
-		br.close();
-		in.close();
 	}
 
 	private static void initializeModules() throws IOException {
@@ -110,7 +154,7 @@ public class Main {
 		Properties props = new Properties();
 		props.load(Main.class.getClassLoader().getResourceAsStream("db.properties"));
 
-		if (GENERATE_SQL) {
+		if (cli.hasOption("sql")) {
 			queryGenerator = new SqlQueryGenerator(lexicon.getSchema(), props);
 		} else {
 			queryGenerator = new RestQueryGenerator(lexicon.getSchema(), props);
