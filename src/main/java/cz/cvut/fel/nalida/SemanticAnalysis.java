@@ -138,7 +138,7 @@ public class SemanticAnalysis {
 			boolean valid = false;
 			if (token.isType(ElementType.ENTITY)) {
 				for (Token attached : tokenization.getAttached(token)) {
-					if (attached.isType(ElementType.WH_WORD)
+					if (tokenization.getRoot().equals(token) || attached.isType(ElementType.WH_WORD)
 							|| (attached.isType(ElementType.VALUE, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE) && attached
 									.getEntityElement().equals(token.getElement()))) {
 						valid = true;
@@ -148,7 +148,7 @@ public class SemanticAnalysis {
 			} else if (token.isType(ElementType.ATTRIBUTE, ElementType.SUBRESOURCE)) {
 				Attribute attribute = (Attribute) token.getElement();
 				for (Token attached : tokenization.getAttached(token)) {
-					if (attached.isType(ElementType.WH_WORD)
+					if (tokenization.getRoot().equals(token) || attached.isType(ElementType.WH_WORD)
 							|| (attached.isType(ElementType.VALUE) && attached.getElement().equals(attribute.getValueElement()))
 							|| (attached.isType(ElementType.ENTITY, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE) && attached
 									.getElement().equals(attribute.getTypeEntity()))) {
