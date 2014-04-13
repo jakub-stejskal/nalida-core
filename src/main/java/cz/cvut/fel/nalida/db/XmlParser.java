@@ -19,6 +19,8 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -34,15 +36,19 @@ import org.xml.sax.SAXException;
 public class XmlParser {
 	final Document document;
 
-	public XmlParser(String xmlDocument) {
-		this.document = parseXmlFile(xmlDocument);
+	public XmlParser(String document) {
+		this.document = parseXmlFile(document);
 	}
 
-	private Document parseXmlFile(String in) {
+	public XmlParser(Document document) {
+		this.document = document;
+	}
+
+	private Document parseXmlFile(String document) {
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
-			InputSource is = new InputSource(new StringReader(in));
+			InputSource is = new InputSource(new StringReader(document));
 			return db.parse(is);
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
@@ -50,6 +56,24 @@ public class XmlParser {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	public static XmlParser combineDocuments(List<XmlParser> documents) {
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder docBuilder;
+		try {
+			docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.newDocument();
+			Element rootSetElement = doc.createElement("results");
+			Node rootSetNode = doc.appendChild(rootSetElement);
+			for (XmlParser d : documents) {
+				rootSetNode.appendChild(doc.importNode(d.document.getFirstChild(), true));
+			}
+			return new XmlParser(doc);
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 

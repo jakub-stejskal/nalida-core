@@ -46,7 +46,7 @@ public class SqlQuery implements Query {
 	}
 
 	@Override
-	public List<String> execute(List<String> ids) throws Exception {
+	public String execute(List<String> ids) throws Exception {
 		List<String> responses = new ArrayList<>();
 		if (ids.isEmpty()) {
 			responses.add(execute(""));
@@ -55,7 +55,7 @@ public class SqlQuery implements Query {
 				responses.add(execute(id));
 			}
 		}
-		return responses;
+		return responses.toString();
 	}
 
 	private String execute(String id) throws Exception {
@@ -63,13 +63,13 @@ public class SqlQuery implements Query {
 	}
 
 	@Override
-	public List<String> projectReference(List<String> queryResponse) throws XPathExpressionException {
+	public List<String> projectReference(String queryResponse) throws XPathExpressionException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<String> projectContent(List<String> queryResponse) throws XPathExpressionException {
+	public List<String> projectContent(String queryResponse) throws XPathExpressionException {
 		// TODO Auto-generated method stub
 		return null;
 	}

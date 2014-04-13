@@ -130,9 +130,7 @@ public class Main {
 
 		if (!cli.hasOption("dry-run")) {
 			try {
-				for (String queryResult : queryPlan.execute()) {
-					System.out.println(queryResult);
-				}
+				System.out.println(queryPlan.execute());
 			} catch (Exception e) {
 				e.printStackTrace(System.out);
 			}

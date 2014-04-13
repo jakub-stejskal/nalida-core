@@ -13,9 +13,9 @@ public class QueryPlan {
 		this.queries.add(query);
 	}
 
-	public List<String> execute() throws Exception {
+	public String execute() throws Exception {
 		List<String> queryParams = Collections.emptyList();
-		List<String> queryResponse = Collections.emptyList();
+		String queryResponse = null;
 		for (Query query : this.queries) {
 			queryResponse = query.execute(queryParams);
 			queryParams = query.projectReference(queryResponse);

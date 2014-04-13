@@ -8,10 +8,10 @@ public interface Query {
 
 	String execute() throws Exception;
 
-	List<String> execute(List<String> queryParams) throws Exception;
+	String execute(List<String> queryParams) throws Exception;
 
-	List<String> projectReference(List<String> queryResponse) throws XPathExpressionException;
+	List<String> projectReference(String queryResponse) throws XPathExpressionException;
 
-	List<String> projectContent(List<String> queryResponse) throws XPathExpressionException;
+	List<String> projectContent(String queryResponse) throws XPathExpressionException;
 
 }

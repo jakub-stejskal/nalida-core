@@ -81,12 +81,12 @@ public class RestQuery implements Query {
 
 	@Override
 	public String execute() throws Exception {
-		return execute("");
+		return execute("").toString();
 	}
 
 	@Override
-	public List<String> execute(List<String> ids) throws Exception {
-		List<String> responses = new ArrayList<>();
+	public String execute(List<String> ids) throws Exception {
+		List<XmlParser> responses = new ArrayList<>();
 		if (ids.isEmpty()) {
 			responses.add(execute(""));
 		} else {
@@ -94,10 +94,10 @@ public class RestQuery implements Query {
 				responses.add(execute(id));
 			}
 		}
-		return responses;
+		return XmlParser.combineDocuments(responses).toString();
 	}
 
-	private String execute(String id) throws Exception {
+	private XmlParser execute(String id) throws Exception {
 		WebResource request = this.webResource.path(id + this.resource);
 		ClientResponse response = request.accept("application/xml").get(ClientResponse.class);
 		System.out.println("Query.execute.request: " + request);
@@ -107,43 +107,35 @@ public class RestQuery implements Query {
 			throw new Exception("Failed : HTTP error code : " + response.getStatus() + " - " + response.getStatusInfo() + ", URL:"
 					+ this.webResource.getURI());
 		}
-		return new XmlParser(response.getEntity(String.class)).toString();
+		return new XmlParser(response.getEntity(String.class));
 	}
 
 	@Override
-	public List<String> projectReference(List<String> queryResponse) throws XPathExpressionException {
-		List<String> allResults = new ArrayList<>();
-		for (String responseElement : queryResponse) {
-			XmlParser responseDoc = new XmlParser(responseElement);
-			String query;
-			if (this.projection.isEmpty()) {
-				query = "//entry/link/@href";
-			} else {
-				String idAttr = this.projection.iterator().next();
-				query = "//" + idAttr + "/@href";
-			}
-			List<String> results = responseDoc.query(query);
-			allResults.addAll(results);
+	public List<String> projectReference(String queryResponse) throws XPathExpressionException {
+		XmlParser responseDoc = new XmlParser(queryResponse);
+		String query;
+		if (this.projection.isEmpty()) {
+			query = "//entry/link/@href";
+		} else {
+			String idAttr = this.projection.iterator().next();
+			query = "//" + idAttr + "/@href";
 		}
-		return allResults;
+		List<String> results = responseDoc.query(query);
+		return results;
 	}
 
 	@Override
-	public List<String> projectContent(List<String> queryResponse) throws XPathExpressionException {
-		List<String> allResults = new ArrayList<>();
-		for (String responseElement : queryResponse) {
-			XmlParser responseDoc = new XmlParser(responseElement);
-			String query;
-			if (this.projection.isEmpty()) {
-				query = "//entry/title/text()";
-			} else {
-				String idAttr = this.projection.iterator().next();
-				query = "//" + idAttr + "/text()";
-			}
-			List<String> results = responseDoc.query(query);
-			allResults.addAll(results);
+	public List<String> projectContent(String queryResponse) throws XPathExpressionException {
+		XmlParser responseDoc = new XmlParser(queryResponse);
+		String query;
+		if (this.projection.isEmpty()) {
+			query = "//entry/title/text()";
+		} else {
+			String idAttr = this.projection.iterator().next();
+			query = "//" + idAttr + "/text()";
 		}
-		return allResults;
+		List<String> results = responseDoc.query(query);
+		return results;
 	}
 
 	@Override
