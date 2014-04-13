@@ -2,8 +2,10 @@ package cz.cvut.fel.nalida;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,6 +25,7 @@ import org.apache.commons.cli.ParseException;
 import cz.cvut.fel.nalida.db.GraphDisplay;
 import cz.cvut.fel.nalida.db.Lexicon;
 import cz.cvut.fel.nalida.db.QueryPlan;
+import cz.cvut.fel.nalida.db.Schema;
 import cz.cvut.fel.nalida.stanford.SemanticAnnotator;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
@@ -37,6 +40,7 @@ import edu.stanford.nlp.util.CoreMap;
 public class Main {
 
 	private static final String QUERIES_FILE = "data/dev.txt";
+	private static final String SCHEMA_FILENAME = "schema.desc";
 	private static final boolean VISUALIZE_SCHEMA = false;
 	static Scanner in = new Scanner(System.in);
 
@@ -45,6 +49,7 @@ public class Main {
 	private static QueryGenerator queryGenerator;
 	private static Lexicon lexicon;
 	private static CommandLine cli;
+	private static Schema schema;
 
 	/**
 	 * @param args
@@ -141,9 +146,11 @@ public class Main {
 		Properties properties = new Properties();
 		properties.load(Main.class.getClassLoader().getResourceAsStream("nlpcore.properties"));
 
-		lexicon = new Lexicon("data/schema/");
+		InputStream input = new FileInputStream(new File("data/schema/" + SCHEMA_FILENAME));
+		schema = Schema.load(input);
+		lexicon = new Lexicon(schema, "data/schema/");
 		if (VISUALIZE_SCHEMA) {
-			GraphDisplay.displayGraph(lexicon.getSchema().getGraph());
+			GraphDisplay.displayGraph(schema.getGraph());
 		}
 
 		syntacticAnalysis = new SyntacticAnalysis(properties, lexicon);
@@ -153,9 +160,9 @@ public class Main {
 		props.load(Main.class.getClassLoader().getResourceAsStream("db.properties"));
 
 		if (cli.hasOption("sql")) {
-			queryGenerator = new SqlQueryGenerator(lexicon.getSchema(), props);
+			queryGenerator = new SqlQueryGenerator(schema, props);
 		} else {
-			queryGenerator = new RestQueryGenerator(lexicon.getSchema(), props);
+			queryGenerator = new RestQueryGenerator(schema, props);
 		}
 	}
 

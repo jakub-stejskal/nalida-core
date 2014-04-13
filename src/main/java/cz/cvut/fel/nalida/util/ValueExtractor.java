@@ -2,8 +2,10 @@ package cz.cvut.fel.nalida.util;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Properties;
@@ -11,7 +13,6 @@ import java.util.Properties;
 import cz.cvut.fel.nalida.Main;
 import cz.cvut.fel.nalida.db.Attribute;
 import cz.cvut.fel.nalida.db.Entity;
-import cz.cvut.fel.nalida.db.Lexicon;
 import cz.cvut.fel.nalida.db.Query;
 import cz.cvut.fel.nalida.db.QueryBuilder;
 import cz.cvut.fel.nalida.db.Schema;
@@ -83,11 +84,13 @@ public class ValueExtractor {
 	}
 
 	public static void main(String[] args) throws Exception {
-		Lexicon lexicon = new Lexicon("data/schema/");
+
+		InputStream input = new FileInputStream(new File("data/schema/schema.desc"));
+		Schema s = Schema.load(input);
 		Properties props = new Properties();
 		props.load(Main.class.getClassLoader().getResourceAsStream("db.properties"));
-		props.put("baseUrl", lexicon.getSchema().getBaseUri());
-		ValueExtractor extractor = new ValueExtractor(lexicon.getSchema(), "data/extracted/", props);
+		props.put("baseUrl", s.getBaseUri());
+		ValueExtractor extractor = new ValueExtractor(s, "data/extracted/", props);
 		extractor.extractAll();
 	}
 }

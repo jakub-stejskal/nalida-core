@@ -1,6 +1,5 @@
 package cz.cvut.fel.nalida.stanford;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,22 +26,8 @@ public class SemanticAnnotator implements Annotator, CoreAnnotation<Set<Token>> 
 	@SuppressWarnings("rawtypes")
 	private static Class<? extends Set> tokenSet = Collections.<Token> emptySet().getClass();
 
-	public SemanticAnnotator(String annotatorClass, Properties props) throws IOException {
-		this(annotatorClass, props, loadLexicon(props));
-	}
-
 	public SemanticAnnotator(String annotatorClass, Properties props, Lexicon lexicon) {
 		this.lexicon = lexicon;
-	}
-
-	private static Lexicon loadLexicon(Properties props) throws IOException {
-		String schemaPath;
-		if (props.containsKey(SCHEMA_PATH)) {
-			schemaPath = props.getProperty(SCHEMA_PATH);
-		} else {
-			schemaPath = "data/schema/";
-		}
-		return new Lexicon(schemaPath);
 	}
 
 	@Override

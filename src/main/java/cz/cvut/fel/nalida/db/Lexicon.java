@@ -3,12 +3,8 @@ package cz.cvut.fel.nalida.db;
 import static java.lang.String.format;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,28 +18,19 @@ import cz.cvut.fel.nalida.Token;
 
 public class Lexicon {
 
-	Schema schema;
 	Map<String, Set<Token>> lexicon;
 	Map<String, Element> elements;
 	Lemmatizer lemmatizer;
 
-	private static final String SCHEMA_FILENAME = "schema.desc";
-
-	public Lexicon(String schemaPath) throws IOException {
-		this.schema = loadSchema(schemaPath);
+	public Lexicon(Schema schema, String valuesPath) throws IOException {
 		this.lexicon = new HashMap<>();
 		this.elements = new HashMap<>();
 		this.lemmatizer = new Lemmatizer();
-		loadLexicon(schemaPath);
+		loadLexicon(schema, valuesPath);
 	}
 
-	private Schema loadSchema(String schemaPath) throws FileNotFoundException {
-		InputStream input = new FileInputStream(new File(schemaPath + SCHEMA_FILENAME));
-		return Schema.load(input);
-	}
-
-	private void loadLexicon(String schemaPath) throws IOException {
-		for (Entity entity : this.schema.getSchema()) {
+	private void loadLexicon(Schema schema, String schemaPath) throws IOException {
+		for (Entity entity : schema.getSchema()) {
 			loadEntity(entity);
 			for (Attribute attribute : entity.getAttributes()) {
 				loadAttribute(entity, attribute);
@@ -108,18 +95,8 @@ public class Lexicon {
 		return this.lexicon.get(lemma.toLowerCase());
 	}
 
-	public Schema getSchema() {
-		return this.schema;
-	}
-
 	@Override
 	public String toString() {
-		return "schema: \n" + this.schema + "\nlexicon: \n" + this.lexicon;
+		return "lexicon: \n" + this.lexicon;
 	}
-
-	public static void main(String[] args) throws Exception {
-		Lexicon l = new Lexicon("data/schema/");
-		System.out.println(l);
-	}
-
 }

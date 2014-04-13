@@ -1,6 +1,5 @@
 package cz.cvut.fel.nalida;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -32,22 +31,5 @@ public class SyntacticAnalysis {
 		this.pipeline.annotate(document);
 
 		return document;
-	}
-
-	/**	
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		Properties props = new Properties();
-		props.put("annotators", "tokenize, ssplit, pos, lemma, parse");
-
-		Lexicon lexicon = new Lexicon("data/schema/");
-		SyntacticAnalysis sa = new SyntacticAnalysis(props, lexicon);
-
-		String text = "Which students attend machine learning course on tuesdays.";
-		Annotation annotation = sa.process(text);
-
-		Main.printSyntacticInfo(annotation);
 	}
 }
