@@ -30,7 +30,7 @@ public class Lexicon {
 	}
 
 	private void loadLexicon(Schema schema, String schemaPath) throws IOException {
-		for (Entity entity : schema.getSchema()) {
+		for (Entity entity : schema.getEntities()) {
 			loadEntity(entity);
 			for (Attribute attribute : entity.getAttributes()) {
 				loadAttribute(entity, attribute);
@@ -45,13 +45,13 @@ public class Lexicon {
 
 	private void loadEntity(Entity entity) {
 		for (String token : entity.getTokens()) {
-			putToSemSet(Lists.newArrayList(token), entity);
+			putToTokens(Lists.newArrayList(token), entity);
 		}
 	}
 
 	private void loadAttribute(Entity entity, Attribute attribute) {
 		for (String token : attribute.getTokens()) {
-			putToSemSet(this.lemmatizer.getLemmas(token), attribute);
+			putToTokens(this.lemmatizer.getLemmas(token), attribute);
 		}
 	}
 
@@ -62,7 +62,7 @@ public class Lexicon {
 			BufferedReader br = new BufferedReader(new FileReader(valueFilename));
 			String line;
 			while ((line = br.readLine()) != null) {
-				putToSemSet(this.lemmatizer.getLemmas(line), attribute.getValueElement());
+				putToTokens(this.lemmatizer.getLemmas(line), attribute.getValueElement());
 
 			}
 			br.close();
@@ -75,23 +75,23 @@ public class Lexicon {
 		BufferedReader br = new BufferedReader(new FileReader(valueFilename));
 		String line;
 		while ((line = br.readLine()) != null) {
-			putToSemSet(this.lemmatizer.getLemmas(line), Element.WH_ELEMENT);
+			putToTokens(this.lemmatizer.getLemmas(line), Element.WH_ELEMENT);
 		}
 		br.close();
 	}
 
-	private void putToSemSet(List<String> words, Element element) {
-		for (String word : words) {
+	private void putToTokens(List<String> lemmas, Element element) {
+		for (String word : lemmas) {
 			Set<Token> tokenSet = this.lexicon.get(word);
 			if (tokenSet == null) {
 				tokenSet = new HashSet<>();
 				this.lexicon.put(word, tokenSet);
 			}
-			tokenSet.add(new Token(words, element));
+			tokenSet.add(new Token(lemmas, element));
 		}
 	}
 
-	public Set<Token> getSemSet(String lemma) {
+	public Set<Token> getTokens(String lemma) {
 		return this.lexicon.get(lemma.toLowerCase());
 	}
 

@@ -40,7 +40,7 @@ public class SemanticAnnotator implements Annotator, CoreAnnotation<Set<Token>> 
 			}
 			for (CoreLabel token : tokens) {
 				Set<Token> compatibleTokens = new HashSet<>();
-				Set<Token> semSet = this.lexicon.getSemSet(token.lemma());
+				Set<Token> semSet = this.lexicon.getTokens(token.lemma());
 				if (semSet == null) {
 					compatibleTokens = null;
 				} else {

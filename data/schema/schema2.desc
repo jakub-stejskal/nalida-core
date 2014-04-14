@@ -1,0 +1,151 @@
+baseUri: https://kosapi.feld.cvut.cz/api/3/
+
+entities:
+  - name: Teacher
+    resource: teachers/
+    tokens: [teacher]
+    attributes:
+      - name:   username
+        type:   string
+        tokens: [username]
+      - name:   email
+        type:   string
+        tokens: [email]
+      - name:   firstName
+        type:   string
+        tokens: [name]
+      - name:   lastName
+        type:   string
+        tokens: [name, surname]
+      - name:   phone
+        type:   string
+        tokens: [phone, phone number]
+      - name:   division
+        type:   Division
+        tokens: [division, department, work, employ]
+      - name:   supervisionPhDStudents
+        type:   string
+        tokens: [supervision]
+    subresources:
+      - name:   courses
+        type:   Course
+        tokens: [teach, course]
+      - name:   parallels
+        type:   Parallel
+        tokens: [teach]
+      - name:   exams
+        type:   Exam
+        tokens: [examine]
+
+  - name: Course
+    resource: courses/
+    tokens: [course]
+    attributes:
+      - name:   name
+        type:   string
+        tokens: [name]
+      - name:   code
+        type:   string
+        tokens: [code]
+      - name:   credits
+        type:   integer
+        tokens: [credit]
+      - name:   department
+        type:   Division
+        tokens: [division, department, teach, manage]
+      - name:   instance/lecturers/teacher
+        type:   Teacher*
+        tokens: [lecturer, lecture]
+      - name:   exams
+        type:   Exam
+        tokens: [exam]
+      - name:   parallels
+        type:   Parallel
+        tokens: [teach]
+      - name:   students
+        type:   Student
+        tokens: [attend]
+
+  - name: Division
+    resource: divisions/
+    tokens: [division, department]
+    attributes:
+      - name:   name
+        type:   string
+        tokens: [name]
+      - name:   code
+        type:   string
+        tokens: [code]
+    subresources:
+      - name:   teachers
+        type:   Teacher
+        tokens: [employ]
+      - name:   courses
+        type:   Course
+        tokens: [teach, manage]
+      - name:   subdivisions
+        type:   Division
+        tokens: [subdivision]
+
+  - name: Exam
+    resource: exams/
+    tokens: [exam]
+    attributes:
+      - name:   capacity
+        type:   integer
+        tokens: [capacity]
+      - name:   occupied
+        type:   string
+        tokens: [occupy]
+    subresources:
+      - name:   attendees
+        type:   Student
+        tokens: [attend]
+
+  - name: Parallel
+    resource: parallels/
+    tokens: [parallel]
+    attributes:
+      - name:   capacity
+        type:   integer
+        tokens: [capacity]
+      - name:   occupied
+        type:   integer
+        tokens: [occupy]
+      - name:   code
+        type:   string
+        tokens: [occupy]
+    subresources:
+      - name:   related
+        type:   Student
+        tokens: [relate]
+      - name:   students
+        type:   Student
+        tokens: [student]
+
+  - name: Student
+    resource: students/
+    tokens: [student]
+    attributes:
+      - name:   username
+        type:   string
+        tokens: [username]
+      - name:   email
+        type:   string
+        tokens: [email]
+      - name:   firstName
+        type:   string
+        tokens: [name]
+      - name:   lastName
+        type:   string
+        tokens: [name, surname]
+      - name:   faculty
+        type:   Division
+        tokens: [faculty]
+      - name:   supervisor
+        type:   Teacher
+        tokens: [supervise]
+    subresources:
+      - name:   parallels
+        type:   Parallel
+        tokens: [parallel, schedule]

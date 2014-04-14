@@ -1,6 +1,6 @@
 baseUri: https://kosapi.feld.cvut.cz/api/3/
 
-schema:
+entities:
   - name: Teacher
     resource: teachers/
     tokens: [teacher]

@@ -36,7 +36,7 @@ public class ValueExtractor {
 	}
 
 	public void extractAll() {
-		for (Entity entity : this.schema.getSchema()) {
+		for (Entity entity : this.schema.getEntities()) {
 			extractEntity(entity);
 		}
 	}

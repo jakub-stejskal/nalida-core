@@ -15,7 +15,7 @@ public final class Schema {
 	private static final int DIRECT_EDGE_WEIGHT = 1;
 	private static final double UNDIRECT_EDGE_WEIGHT = 1.1;
 	private String baseUri;
-	private List<Entity> schema;
+	private List<Entity> entities;
 	private DirectedWeightedMultigraph<Element, DefaultWeightedEdge> graph;
 
 	public String getBaseUri() {
@@ -26,20 +26,20 @@ public final class Schema {
 		this.baseUri = baseUri;
 	}
 
-	public List<Entity> getSchema() {
-		return this.schema;
+	public List<Entity> getEntities() {
+		return this.entities;
 	}
 
 	public DirectedWeightedMultigraph<Element, DefaultWeightedEdge> getGraph() {
 		return this.graph;
 	}
 
-	public void setSchema(List<Entity> schema) {
-		this.schema = schema;
+	public void setEntities(List<Entity> entities) {
+		this.entities = entities;
 	}
 
 	public Entity getEntityByName(String name) {
-		for (Entity entity : this.schema) {
+		for (Entity entity : this.entities) {
 			if (entity.getName().equals(name)) {
 				return entity;
 			}
@@ -52,9 +52,9 @@ public final class Schema {
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(format("BaseUri: %s\n", this.baseUri));
-		sb.append(format("Schema: \n"));
+		sb.append(format("Entities: \n"));
 
-		for (Entity entity : this.schema) {
+		for (Entity entity : this.entities) {
 			sb.append(entity.toStringDeep() + "\n");
 		}
 
@@ -70,10 +70,10 @@ public final class Schema {
 
 	private Schema linkReferences() {
 		Map<String, Entity> entityNames = new HashMap<>();
-		for (Entity entity : this.schema) {
+		for (Entity entity : this.entities) {
 			entityNames.put(entity.getName(), entity);
 		}
-		for (Entity entity : this.schema) {
+		for (Entity entity : this.entities) {
 			for (Attribute attribute : entity.getAttributes()) {
 				attribute.parent = entity;
 				if (!attribute.isPrimitiveType()) {
@@ -99,10 +99,10 @@ public final class Schema {
 	private void createGraph() {
 		this.graph = new DirectedWeightedMultigraph<>(DefaultWeightedEdge.class);
 
-		for (Entity entity : this.schema) {
+		for (Entity entity : this.entities) {
 			this.graph.addVertex(entity);
 		}
-		for (Entity entity : this.schema) {
+		for (Entity entity : this.entities) {
 			for (Attribute attribute : entity.getAttributes()) {
 				if (!attribute.isPrimitiveType()) {
 					Entity type = attribute.getTypeEntity();

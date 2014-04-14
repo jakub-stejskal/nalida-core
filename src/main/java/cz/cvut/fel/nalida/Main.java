@@ -60,6 +60,7 @@ public class Main {
 		parseArguments(args);
 		initializeModules();
 
+		System.out.println(schema);
 		System.out.println(lexicon);
 
 		if (cli.hasOption("query")) {
