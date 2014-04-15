@@ -9,9 +9,11 @@
 /target
 /data/*.txt
 /data/schema/*.values
+/data/schema2/*.values
 /data/extracted
 
 /.project
 /.settings
 
 /src/main/resources/db.properties
+/data/schema2/common.wh.values

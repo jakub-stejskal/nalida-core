@@ -40,6 +40,7 @@ import edu.stanford.nlp.util.CoreMap;
 public class Main {
 
 	private static final String QUERIES_FILE = "data/dev.txt";
+	private static final String DATA_PATH = "data/schema2/";
 	private static final String SCHEMA_FILENAME = "schema.desc";
 	private static final boolean VISUALIZE_SCHEMA = false;
 	static Scanner in = new Scanner(System.in);
@@ -147,9 +148,9 @@ public class Main {
 		Properties properties = new Properties();
 		properties.load(Main.class.getClassLoader().getResourceAsStream("nlpcore.properties"));
 
-		InputStream input = new FileInputStream(new File("data/schema/" + SCHEMA_FILENAME));
+		InputStream input = new FileInputStream(new File(DATA_PATH + SCHEMA_FILENAME));
 		schema = Schema.load(input);
-		lexicon = new Lexicon(schema, "data/schema/");
+		lexicon = new Lexicon(schema, DATA_PATH);
 		if (VISUALIZE_SCHEMA) {
 			GraphDisplay.displayGraph(schema.getGraph());
 		}

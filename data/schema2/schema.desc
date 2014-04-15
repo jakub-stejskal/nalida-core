@@ -117,7 +117,7 @@ entities:
         tokens: [occupy]
     subresources:
       - name:   related
-        type:   Student
+        type:   Parallel
         tokens: [relate]
       - name:   students
         type:   Student
