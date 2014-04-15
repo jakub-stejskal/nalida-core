@@ -2,6 +2,10 @@ package cz.cvut.fel.nalida.db;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+
 public class Attribute extends Element {
 	private String type;
 	protected Entity typeEntity;
@@ -23,6 +27,7 @@ public class Attribute extends Element {
 		return toEntityElement().getName() + "." + getName();
 	}
 
+	@XmlTransient
 	public Entity getTypeEntity() {
 		return this.typeEntity;
 	}
@@ -65,6 +70,8 @@ public class Attribute extends Element {
 		this.tokens = tokens;
 	}
 
+	@XmlElementWrapper(name = "tokens")
+	@XmlElement(name = "token")
 	public List<String> getTokens() {
 		return this.tokens;
 	}

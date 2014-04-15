@@ -7,10 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.yaml.snakeyaml.Yaml;
 
+@XmlRootElement
 public final class Schema {
 	private static final int DIRECT_EDGE_WEIGHT = 1;
 	private static final double UNDIRECT_EDGE_WEIGHT = 1.1;
@@ -26,6 +31,8 @@ public final class Schema {
 		this.baseUri = baseUri;
 	}
 
+	@XmlElementWrapper(name = "entities")
+	@XmlElement(name = "entity")
 	public List<Entity> getEntities() {
 		return this.entities;
 	}
