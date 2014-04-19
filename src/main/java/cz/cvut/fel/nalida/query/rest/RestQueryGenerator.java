@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida;
+package cz.cvut.fel.nalida.query.rest;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,13 +11,15 @@ import org.jgrapht.graph.DirectedWeightedMultigraph;
 
 import com.google.common.collect.Iterables;
 
-import cz.cvut.fel.nalida.db.Attribute;
-import cz.cvut.fel.nalida.db.Element;
-import cz.cvut.fel.nalida.db.Element.ElementType;
-import cz.cvut.fel.nalida.db.Entity;
-import cz.cvut.fel.nalida.db.QueryBuilder;
-import cz.cvut.fel.nalida.db.QueryPlan;
-import cz.cvut.fel.nalida.db.Schema;
+import cz.cvut.fel.nalida.query.QueryGenerator;
+import cz.cvut.fel.nalida.query.QueryPlan;
+import cz.cvut.fel.nalida.schema.Attribute;
+import cz.cvut.fel.nalida.schema.Element;
+import cz.cvut.fel.nalida.schema.Entity;
+import cz.cvut.fel.nalida.schema.Schema;
+import cz.cvut.fel.nalida.schema.Element.ElementType;
+import cz.cvut.fel.nalida.tokenization.Token;
+import cz.cvut.fel.nalida.tokenization.Tokenization;
 
 public class RestQueryGenerator extends QueryGenerator {
 
@@ -36,7 +38,7 @@ public class RestQueryGenerator extends QueryGenerator {
 		List<DefaultWeightedEdge> path = getShortestPath(tokenization, projectionEntity, constraintEntity);
 
 		QueryPlan plan = new QueryPlan();
-		QueryBuilder query = new QueryBuilder(this.props);
+		RestQueryBuilder query = new RestQueryBuilder(this.props);
 		for (DefaultWeightedEdge edge : path) {
 			Element source = graph.getEdgeSource(edge);
 			Element target = graph.getEdgeTarget(edge);
@@ -49,7 +51,7 @@ public class RestQueryGenerator extends QueryGenerator {
 						query.projection("content/" + attribute.getName());
 						addConstraints(query, "", entity, constraints);
 						plan.addQuery(query.build());
-						query = new QueryBuilder(this.props);
+						query = new RestQueryBuilder(this.props);
 					} else {
 						addConstraints(query, attribute.getName() + ".", entity, constraints);
 					}
@@ -57,7 +59,7 @@ public class RestQueryGenerator extends QueryGenerator {
 					query.resource(entity.getResource());
 					addConstraints(query, "", entity, constraints);
 					plan.addQuery(query.build());
-					query = new QueryBuilder(this.props);
+					query = new RestQueryBuilder(this.props);
 				} else {
 					throw new UnsupportedOperationException("Unsupported connection: " + edge);
 				}
@@ -88,7 +90,7 @@ public class RestQueryGenerator extends QueryGenerator {
 		return plan;
 	}
 
-	private void addConstraints(QueryBuilder query, String constrAttribute, Entity constrEntity, Set<Token> constraints) {
+	private void addConstraints(RestQueryBuilder query, String constrAttribute, Entity constrEntity, Set<Token> constraints) {
 		for (Token constrToken : constraints) {
 			if (constrToken.getEntityElement().equals(constrEntity)) {
 				query.constraint(constrAttribute + constrToken.getElementName(), "==",

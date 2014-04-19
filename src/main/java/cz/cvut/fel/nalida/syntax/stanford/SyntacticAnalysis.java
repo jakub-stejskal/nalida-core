@@ -1,12 +1,11 @@
-package cz.cvut.fel.nalida;
+package cz.cvut.fel.nalida.syntax.stanford;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Properties;
 
-import cz.cvut.fel.nalida.db.Lexicon;
-import cz.cvut.fel.nalida.stanford.SemanticAnnotator;
+import cz.cvut.fel.nalida.Lexicon;
 import edu.stanford.nlp.ling.CoreAnnotations.DocDateAnnotation;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;

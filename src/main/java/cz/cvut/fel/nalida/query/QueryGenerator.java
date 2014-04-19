@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida;
+package cz.cvut.fel.nalida.query;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,12 +16,13 @@ import org.jgrapht.graph.DirectedWeightedMultigraph;
 
 import com.google.common.collect.Sets;
 
-import cz.cvut.fel.nalida.db.Element;
-import cz.cvut.fel.nalida.db.Element.ElementType;
-import cz.cvut.fel.nalida.db.Entity;
-import cz.cvut.fel.nalida.db.QueryPlan;
-import cz.cvut.fel.nalida.db.Schema;
-import cz.cvut.fel.nalida.db.Subresource;
+import cz.cvut.fel.nalida.schema.Element;
+import cz.cvut.fel.nalida.schema.Entity;
+import cz.cvut.fel.nalida.schema.Schema;
+import cz.cvut.fel.nalida.schema.Subresource;
+import cz.cvut.fel.nalida.schema.Element.ElementType;
+import cz.cvut.fel.nalida.tokenization.Token;
+import cz.cvut.fel.nalida.tokenization.Tokenization;
 
 abstract public class QueryGenerator {
 	protected final Schema schema;

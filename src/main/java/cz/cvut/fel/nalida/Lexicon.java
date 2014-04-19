@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida.db;
+package cz.cvut.fel.nalida;
 
 import static java.lang.String.format;
 
@@ -13,8 +13,12 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-import cz.cvut.fel.nalida.Lemmatizer;
-import cz.cvut.fel.nalida.Token;
+import cz.cvut.fel.nalida.schema.Attribute;
+import cz.cvut.fel.nalida.schema.Element;
+import cz.cvut.fel.nalida.schema.Entity;
+import cz.cvut.fel.nalida.schema.Schema;
+import cz.cvut.fel.nalida.syntax.stanford.Lemmatizer;
+import cz.cvut.fel.nalida.tokenization.Token;
 
 public class Lexicon {
 

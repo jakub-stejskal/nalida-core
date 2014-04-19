@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida.db;
+package cz.cvut.fel.nalida.schema;
 
 import java.util.Collections;
 import java.util.List;

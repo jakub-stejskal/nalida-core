@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida;
+package cz.cvut.fel.nalida.tokenization;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,10 +10,10 @@ import java.util.Set;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
-import cz.cvut.fel.nalida.db.Attribute;
-import cz.cvut.fel.nalida.db.Element.ElementType;
-import cz.cvut.fel.nalida.db.Lexicon;
-import cz.cvut.fel.nalida.stanford.SemanticAnnotator;
+import cz.cvut.fel.nalida.Lexicon;
+import cz.cvut.fel.nalida.schema.Attribute;
+import cz.cvut.fel.nalida.schema.Element.ElementType;
+import cz.cvut.fel.nalida.syntax.stanford.SemanticAnnotator;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -24,11 +24,11 @@ import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcess
 import edu.stanford.nlp.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.util.CoreMap;
 
-public class SemanticAnalysis {
+public class Tokenizer {
 
 	private static final boolean VALIDATE_BY_TOKENS = false;
 
-	public SemanticAnalysis(Lexicon lexicon) {
+	public Tokenizer(Lexicon lexicon) {
 
 	}
 

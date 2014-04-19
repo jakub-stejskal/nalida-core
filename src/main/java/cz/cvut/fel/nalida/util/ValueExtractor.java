@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.Properties;
 
 import cz.cvut.fel.nalida.Main;
-import cz.cvut.fel.nalida.db.Attribute;
-import cz.cvut.fel.nalida.db.Entity;
-import cz.cvut.fel.nalida.db.Query;
-import cz.cvut.fel.nalida.db.QueryBuilder;
-import cz.cvut.fel.nalida.db.Schema;
-import cz.cvut.fel.nalida.db.XmlParser;
+import cz.cvut.fel.nalida.query.Query;
+import cz.cvut.fel.nalida.query.rest.RestQueryBuilder;
+import cz.cvut.fel.nalida.schema.Attribute;
+import cz.cvut.fel.nalida.schema.Entity;
+import cz.cvut.fel.nalida.schema.Schema;
 
 public class ValueExtractor {
 	Schema schema;
@@ -51,7 +50,7 @@ public class ValueExtractor {
 	}
 
 	private boolean performQuery(Entity entity, int offset) {
-		Query query = new QueryBuilder(this.props).resource(entity.getResource()).projection("content").offset(offset).limit(this.limit)
+		Query query = new RestQueryBuilder(this.props).resource(entity.getResource()).projection("content").offset(offset).limit(this.limit)
 				.build();
 
 		try {

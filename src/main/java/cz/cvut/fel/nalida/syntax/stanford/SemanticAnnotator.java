@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida.stanford;
+package cz.cvut.fel.nalida.syntax.stanford;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import cz.cvut.fel.nalida.Token;
-import cz.cvut.fel.nalida.db.Lexicon;
+import cz.cvut.fel.nalida.Lexicon;
+import cz.cvut.fel.nalida.tokenization.Token;
 import edu.stanford.nlp.ling.CoreAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;

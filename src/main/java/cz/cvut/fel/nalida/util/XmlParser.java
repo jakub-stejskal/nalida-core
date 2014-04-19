@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida.db;
+package cz.cvut.fel.nalida.util;
 
 import java.io.IOException;
 import java.io.StringReader;

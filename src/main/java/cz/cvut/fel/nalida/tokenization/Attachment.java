@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida;
+package cz.cvut.fel.nalida.tokenization;
 
 public class Attachment<T> {
 	T source;

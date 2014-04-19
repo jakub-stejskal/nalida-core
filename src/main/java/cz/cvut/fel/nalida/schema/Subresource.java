@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida.db;
+package cz.cvut.fel.nalida.schema;
 
 public class Subresource extends Attribute {
 	@Override

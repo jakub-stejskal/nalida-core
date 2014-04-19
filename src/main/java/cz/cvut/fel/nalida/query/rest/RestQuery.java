@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida.db;
+package cz.cvut.fel.nalida.query.rest;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -17,6 +17,9 @@ import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+
+import cz.cvut.fel.nalida.query.Query;
+import cz.cvut.fel.nalida.util.XmlParser;
 
 public class RestQuery implements Query {
 

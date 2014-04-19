@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida;
+package cz.cvut.fel.nalida.syntax.stanford;
 
 import java.util.ArrayList;
 import java.util.Arrays;

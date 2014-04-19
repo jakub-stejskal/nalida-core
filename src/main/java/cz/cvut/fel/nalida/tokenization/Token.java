@@ -1,10 +1,10 @@
-package cz.cvut.fel.nalida;
+package cz.cvut.fel.nalida.tokenization;
 
 import java.util.List;
 
-import cz.cvut.fel.nalida.db.Element;
-import cz.cvut.fel.nalida.db.Element.ElementType;
-import cz.cvut.fel.nalida.db.Entity;
+import cz.cvut.fel.nalida.schema.Element;
+import cz.cvut.fel.nalida.schema.Entity;
+import cz.cvut.fel.nalida.schema.Element.ElementType;
 
 public class Token {
 	protected List<String> words;

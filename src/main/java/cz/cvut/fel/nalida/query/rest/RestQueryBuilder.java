@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida.db;
+package cz.cvut.fel.nalida.query.rest;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,7 +12,9 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
-public class QueryBuilder {
+import cz.cvut.fel.nalida.query.Query;
+
+public class RestQueryBuilder {
 	private final WebResource webResource;
 	protected String resource;
 	protected Set<String> projection;
@@ -21,7 +23,7 @@ public class QueryBuilder {
 	private int offset = 0;
 	private int limit = 100;
 
-	public QueryBuilder(Properties properties) {
+	public RestQueryBuilder(Properties properties) {
 
 		String baseUrl = properties.getProperty("baseUrl");
 		String user = properties.getProperty("auth.user");
@@ -37,35 +39,35 @@ public class QueryBuilder {
 		this.constraints = new HashMap<>();
 	}
 
-	public QueryBuilder collection(boolean isColleciton) {
+	public RestQueryBuilder collection(boolean isColleciton) {
 		this.isCollection = isColleciton;
 		return this;
 	}
 
-	public QueryBuilder resource(String resource) {
+	public RestQueryBuilder resource(String resource) {
 		if (this.resource == null) {
 			this.resource = resource;
 		}
 		return this;
 	}
 
-	public QueryBuilder projection(String... attributes) {
+	public RestQueryBuilder projection(String... attributes) {
 		this.projection.addAll(Arrays.asList(attributes));
 		return this;
 	}
 
-	public QueryBuilder constraint(String attribute, String operator, String... values) {
+	public RestQueryBuilder constraint(String attribute, String operator, String... values) {
 		String concatValue = "*" + Joiner.on("*").join(values) + "*";
 		this.constraints.put(attribute, operator + concatValue.toString());
 		return this;
 	}
 
-	public QueryBuilder offset(int offset) {
+	public RestQueryBuilder offset(int offset) {
 		this.offset = offset;
 		return this;
 	}
 
-	public QueryBuilder limit(int limit) {
+	public RestQueryBuilder limit(int limit) {
 		this.limit = limit;
 		return this;
 	}

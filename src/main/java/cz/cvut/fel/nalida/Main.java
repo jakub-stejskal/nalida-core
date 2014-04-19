@@ -22,11 +22,16 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import cz.cvut.fel.nalida.db.GraphDisplay;
-import cz.cvut.fel.nalida.db.Lexicon;
-import cz.cvut.fel.nalida.db.QueryPlan;
-import cz.cvut.fel.nalida.db.Schema;
-import cz.cvut.fel.nalida.stanford.SemanticAnnotator;
+import cz.cvut.fel.nalida.query.QueryGenerator;
+import cz.cvut.fel.nalida.query.QueryPlan;
+import cz.cvut.fel.nalida.query.rest.RestQueryGenerator;
+import cz.cvut.fel.nalida.query.sql.SqlQueryGenerator;
+import cz.cvut.fel.nalida.schema.Schema;
+import cz.cvut.fel.nalida.syntax.stanford.SemanticAnnotator;
+import cz.cvut.fel.nalida.syntax.stanford.SyntacticAnalysis;
+import cz.cvut.fel.nalida.tokenization.Tokenizer;
+import cz.cvut.fel.nalida.tokenization.Tokenization;
+import cz.cvut.fel.nalida.util.GraphDisplay;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
@@ -46,7 +51,7 @@ public class Main {
 	static Scanner in = new Scanner(System.in);
 
 	private static SyntacticAnalysis syntacticAnalysis;
-	private static SemanticAnalysis semanticAnalysis;
+	private static Tokenizer semanticAnalysis;
 	private static QueryGenerator queryGenerator;
 	private static Lexicon lexicon;
 	private static CommandLine cli;
@@ -156,7 +161,7 @@ public class Main {
 		}
 
 		syntacticAnalysis = new SyntacticAnalysis(properties, lexicon);
-		semanticAnalysis = new SemanticAnalysis(lexicon);
+		semanticAnalysis = new Tokenizer(lexicon);
 
 		Properties props = new Properties();
 		props.load(Main.class.getClassLoader().getResourceAsStream("db.properties"));

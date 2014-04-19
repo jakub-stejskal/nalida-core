@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida.db;
+package cz.cvut.fel.nalida.query.sql;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,8 @@ import java.util.Set;
 import javax.xml.xpath.XPathExpressionException;
 
 import com.google.common.base.Joiner;
+
+import cz.cvut.fel.nalida.query.Query;
 
 public class SqlQuery implements Query {
 

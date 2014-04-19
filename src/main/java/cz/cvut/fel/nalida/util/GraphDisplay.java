@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida.db;
+package cz.cvut.fel.nalida.util;
 
 import java.awt.Dimension;
 
@@ -12,6 +12,8 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxConstants;
+
+import cz.cvut.fel.nalida.schema.Element;
 
 public class GraphDisplay extends JApplet {
 	/**

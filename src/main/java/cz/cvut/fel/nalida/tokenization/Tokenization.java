@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida;
+package cz.cvut.fel.nalida.tokenization;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,8 +9,8 @@ import java.util.Set;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
-import cz.cvut.fel.nalida.db.Element;
-import cz.cvut.fel.nalida.db.Element.ElementType;
+import cz.cvut.fel.nalida.schema.Element;
+import cz.cvut.fel.nalida.schema.Element.ElementType;
 
 public class Tokenization {
 	final protected Set<Attachment<Token>> attachments;
