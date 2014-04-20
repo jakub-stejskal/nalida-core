@@ -29,8 +29,9 @@ import cz.cvut.fel.nalida.query.sql.SqlQueryGenerator;
 import cz.cvut.fel.nalida.schema.Schema;
 import cz.cvut.fel.nalida.syntax.stanford.SemanticAnnotator;
 import cz.cvut.fel.nalida.syntax.stanford.SyntacticAnalysis;
-import cz.cvut.fel.nalida.tokenization.Tokenizer;
 import cz.cvut.fel.nalida.tokenization.Tokenization;
+import cz.cvut.fel.nalida.tokenization.Tokenizer;
+import cz.cvut.fel.nalida.tokenization.stanford.StanfordTokenizer;
 import cz.cvut.fel.nalida.util.GraphDisplay;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
@@ -51,7 +52,7 @@ public class Main {
 	static Scanner in = new Scanner(System.in);
 
 	private static SyntacticAnalysis syntacticAnalysis;
-	private static Tokenizer semanticAnalysis;
+	private static Tokenizer<Annotation> tokenizer;
 	private static QueryGenerator queryGenerator;
 	private static Lexicon lexicon;
 	private static CommandLine cli;
@@ -126,7 +127,7 @@ public class Main {
 
 		Annotation annotatedLine = syntacticAnalysis.process(line);
 		//				printSyntacticInfo(annotatedLine);
-		Set<Tokenization> tokenizations = semanticAnalysis.getTokenizations(annotatedLine);
+		Set<Tokenization> tokenizations = tokenizer.getTokenizations(annotatedLine);
 		//			printSemanticInfo(tokenizations);
 		Tokenization tokenization = pickTokenization(tokenizations);
 		System.out.println("Selected tokenization: ");
@@ -161,7 +162,7 @@ public class Main {
 		}
 
 		syntacticAnalysis = new SyntacticAnalysis(properties, lexicon);
-		semanticAnalysis = new Tokenizer(lexicon);
+		tokenizer = new StanfordTokenizer(lexicon);
 
 		Properties props = new Properties();
 		props.load(Main.class.getClassLoader().getResourceAsStream("db.properties"));

@@ -16,4 +16,12 @@ public class Attachment<T> {
 	public String toString() {
 		return this.source + "-" + this.type + "-" + this.target;
 	}
+
+	public T getSource() {
+		return this.source;
+	}
+
+	public T getTarget() {
+		return this.target;
+	}
 }
