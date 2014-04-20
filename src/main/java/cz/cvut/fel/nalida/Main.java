@@ -151,9 +151,6 @@ public class Main {
 	}
 
 	private static void initializeModules() throws IOException {
-		Properties properties = new Properties();
-		properties.load(Main.class.getClassLoader().getResourceAsStream("nlpcore.properties"));
-
 		InputStream input = new FileInputStream(new File(DATA_PATH + SCHEMA_FILENAME));
 		schema = Schema.load(input);
 		lexicon = new Lexicon(schema, DATA_PATH);
@@ -161,7 +158,7 @@ public class Main {
 			GraphDisplay.displayGraph(schema.getGraph());
 		}
 
-		syntacticAnalysis = new SyntacticAnalysis(properties, lexicon);
+		syntacticAnalysis = new SyntacticAnalysis(lexicon);
 		tokenizer = new StanfordTokenizer(lexicon);
 
 		Properties props = new Properties();

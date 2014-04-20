@@ -26,16 +26,16 @@ public class Nalida {
 	private final SqlQueryGenerator sqlQueryGenerator;
 
 	public Nalida() throws IOException {
-		this(loadPropsFromFile("nlpcore.properties"), loadPropsFromFile("db.properties"), "data/schema/schema.desc", "data/schema/");
+		this(loadPropsFromFile("db.properties"), "data/schema/schema.desc", "data/schema/");
 	}
 
-	public Nalida(Properties nlpProps, Properties dbProps, String schemaPath, String valuesPath) throws IOException {
+	public Nalida(Properties dbProps, String schemaPath, String valuesPath) throws IOException {
 
 		InputStream input = new FileInputStream(new File(schemaPath));
 		this.schema = Schema.load(input);
 		Lexicon lexicon = new Lexicon(this.schema, valuesPath);
 
-		this.syntacticAnalysis = new SyntacticAnalysis(nlpProps, lexicon);
+		this.syntacticAnalysis = new SyntacticAnalysis(lexicon);
 		this.tokenizer = new StanfordTokenizer(lexicon);
 
 		this.restQueryGenerator = new RestQueryGenerator(this.schema, dbProps);
