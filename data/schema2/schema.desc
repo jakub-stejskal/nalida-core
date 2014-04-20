@@ -115,6 +115,9 @@ entities:
       - name:   code
         type:   string
         tokens: [occupy]
+      - name: parallelType
+        type: string
+        tokens: [type]
     subresources:
       - name:   related
         type:   Parallel
