@@ -13,7 +13,7 @@ entities:
         tokens: [email]
       - name:   firstName
         type:   string
-        tokens: [name]
+        tokens: [first name]
       - name:   lastName
         type:   string
         tokens: [name, surname]
@@ -29,7 +29,7 @@ entities:
     subresources:
       - name:   courses
         type:   Course
-        tokens: [teach, course]
+        tokens: [teach]
       - name:   parallels
         type:   Parallel
         tokens: [teach]
@@ -100,7 +100,7 @@ entities:
     subresources:
       - name:   attendees
         type:   Student
-        tokens: [attend]
+        tokens: [sit, take]
 
   - name: Parallel
     resource: parallels/
@@ -124,7 +124,7 @@ entities:
         tokens: [relate]
       - name:   students
         type:   Student
-        tokens: [student]
+        tokens: [attend]
 
   - name: Student
     resource: students/

@@ -20,7 +20,7 @@ public class Tokenization {
 	public Tokenization(List<Token> tokenList, Integer root, Set<Attachment<Integer>> attachmentsTemplate) {
 		this.tokens = tokenList;
 		this.attachments = createAttachments(attachmentsTemplate);
-		this.root = this.tokens.get(root.intValue());
+		this.root = (root == null) ? null : this.tokens.get(root.intValue());
 	}
 
 	private Set<Attachment<Token>> createAttachments(Set<Attachment<Integer>> attachmentsTemplate) {
