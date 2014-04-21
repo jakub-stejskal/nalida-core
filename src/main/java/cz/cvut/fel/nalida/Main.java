@@ -14,8 +14,8 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
 
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
@@ -48,7 +48,6 @@ public class Main {
 	private static final String QUERIES_FILE = "data/dev.txt";
 	private static final String DATA_PATH = "data/schema2/";
 	private static final String SCHEMA_FILENAME = "schema.desc";
-	private static final boolean VISUALIZE_SCHEMA = false;
 	static Scanner in = new Scanner(System.in);
 
 	private static SyntacticAnalysis syntacticAnalysis;
@@ -91,6 +90,8 @@ public class Main {
 			br.close();
 			in.close();
 		}
+
+		System.exit(0);
 	}
 
 	private static void parseArguments(String[] args) {
@@ -105,9 +106,10 @@ public class Main {
 		options.addOption("d", "dry-run", false, "translate a query without executing it");
 		options.addOption("v", "verbose", false, "prints out detailed information about what is being done");
 		options.addOption("s", "sql", false, "translate a query into SQL instead of REST request");
+		options.addOption("g", "graph", false, "visualize entity-relationship graph");
 
 		try {
-			cli = new BasicParser().parse(options, args, true);
+			cli = new DefaultParser().parse(options, args, true);
 		} catch (ParseException e) {
 			System.out.println(e.getMessage());
 			System.out.println();
@@ -154,7 +156,7 @@ public class Main {
 		InputStream input = new FileInputStream(new File(DATA_PATH + SCHEMA_FILENAME));
 		schema = Schema.load(input);
 		lexicon = new Lexicon(schema, DATA_PATH);
-		if (VISUALIZE_SCHEMA) {
+		if (cli.hasOption("graph")) {
 			GraphDisplay.displayGraph(schema.getGraph());
 		}
 
