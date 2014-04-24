@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(propOrder = { "resource", "tokens", "attributes", "subresources" })
 public class Entity extends Element {
 	private String resource;
-	private List<String> tokens;
+	private List<String> tokens = Collections.emptyList();
 	private List<Attribute> attributes = Collections.emptyList();
 	private List<Subresource> subresources = Collections.emptyList();
 

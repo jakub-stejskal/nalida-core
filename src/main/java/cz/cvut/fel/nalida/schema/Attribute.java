@@ -1,5 +1,6 @@
 package cz.cvut.fel.nalida.schema;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -9,7 +10,7 @@ import javax.xml.bind.annotation.XmlTransient;
 public class Attribute extends Element {
 	private String type;
 	protected Entity typeEntity;
-	private List<String> tokens;
+	private List<String> tokens = Collections.emptyList();
 	private final Value valueElement;
 	protected Entity parent;
 

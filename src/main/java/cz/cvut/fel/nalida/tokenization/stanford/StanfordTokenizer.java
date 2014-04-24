@@ -1,6 +1,7 @@
 package cz.cvut.fel.nalida.tokenization.stanford;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +31,7 @@ import edu.stanford.nlp.util.CoreMap;
 
 public class StanfordTokenizer implements Tokenizer<Annotation> {
 
-	private static final boolean VALIDATE_BY_TOKENS = false;
+	private static final boolean VALIDATE_BY_TOKENS = true;
 
 	public StanfordTokenizer(Lexicon lexicon) {
 
@@ -111,6 +112,11 @@ public class StanfordTokenizer implements Tokenizer<Annotation> {
 				validTokenizations.add(tokenization);
 			}
 		}
+
+		if (validTokenizations.size() == 1 && validTokenizations.iterator().next().getElements().isEmpty()) {
+			return Collections.emptySet();
+		}
+
 		return validTokenizations;
 	}
 
@@ -143,7 +149,7 @@ public class StanfordTokenizer implements Tokenizer<Annotation> {
 			boolean valid = false;
 			if (token.isType(ElementType.ENTITY)) {
 				for (Token attached : tokenization.getAttached(token)) {
-					if (tokenization.getRoot().equals(token)
+					if (token.equals(tokenization.getRoot())
 							|| attached.isType(ElementType.WH_WORD)
 							|| (attached.isType(ElementType.VALUE, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE) && attached
 									.getEntityElement().equals(token.getElement()))) {
@@ -154,7 +160,7 @@ public class StanfordTokenizer implements Tokenizer<Annotation> {
 			} else if (token.isType(ElementType.ATTRIBUTE, ElementType.SUBRESOURCE)) {
 				Attribute attribute = (Attribute) token.getElement();
 				for (Token attached : tokenization.getAttached(token)) {
-					if (tokenization.getRoot().equals(token)
+					if (token.equals(tokenization.getRoot())
 							|| attached.isType(ElementType.WH_WORD)
 							|| (attached.isType(ElementType.VALUE) && attached.getElement().equals(attribute.getValueElement()))
 							|| (attached.isType(ElementType.ENTITY, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE) && attached

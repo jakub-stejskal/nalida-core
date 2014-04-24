@@ -133,10 +133,12 @@ public class Main {
 		//			printSemanticInfo(tokenizations);
 		Tokenization tokenization = pickTokenization(tokenizations);
 		System.out.println("Selected tokenization: ");
-		System.out.println(tokenization);
+
 		if (tokenization == null) {
+			System.out.println("Failed to translate query.");
 			return;
 		}
+		System.out.println(tokenization);
 
 		QueryPlan queryPlan = queryGenerator.generateQuery(tokenization);
 		System.out.println("Generated query:");
@@ -176,7 +178,12 @@ public class Main {
 	private static Tokenization pickTokenization(Set<Tokenization> tokenizations) throws IOException {
 		System.out.println("pickTokenization: " + tokenizations.size());
 		if (tokenizations.size() == 1) {
-			return tokenizations.iterator().next();
+			Tokenization tokenization = tokenizations.iterator().next();
+			if (tokenization.getElements().isEmpty()) {
+				return null;
+			} else {
+				return tokenization;
+			}
 		} else if (tokenizations.size() == 0) {
 			return null;
 		}
