@@ -56,6 +56,7 @@ entities:
       - name:   instance/lecturers/teacher
         type:   Teacher*
         tokens: [lecturer, lecture]
+    subresources:
       - name:   exams
         type:   Exam
         tokens: [exam]
@@ -94,6 +95,15 @@ entities:
       - name:   capacity
         type:   integer
         tokens: [capacity]
+      - name:   course
+        type:   Course
+        tokens: [course]
+      - name:   department
+        type:   Division
+        tokens: [department]
+      - name:   examiner
+        type:   Teacher
+        tokens: [examiner, examine]
       - name:   occupied
         type:   string
         tokens: [occupy]
@@ -114,10 +124,16 @@ entities:
         tokens: [occupy]
       - name:   code
         type:   string
-        tokens: [occupy]
+        tokens: [code]
       - name: parallelType
         type: string
         tokens: [type]
+      - name:   course
+        type:   Course
+        tokens: [course]
+      - name:   teachers/teacher
+        type:   Teacher*
+        tokens: [teacher, teach]
     subresources:
       - name:   related
         type:   Parallel
@@ -142,6 +158,9 @@ entities:
       - name:   lastName
         type:   string
         tokens: [name, surname]
+      - name:   department
+        type:   Division
+        tokens: [department]
       - name:   faculty
         type:   Division
         tokens: [faculty]
@@ -152,3 +171,6 @@ entities:
       - name:   parallels
         type:   Parallel
         tokens: [parallel, schedule]
+      - name:   registeredExams
+        type:   Exam
+        tokens: [take, sit, register]
