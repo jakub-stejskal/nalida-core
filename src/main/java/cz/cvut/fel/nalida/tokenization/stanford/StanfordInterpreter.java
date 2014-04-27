@@ -12,13 +12,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import cz.cvut.fel.nalida.Lexicon;
+import cz.cvut.fel.nalida.interpretation.Attachment;
+import cz.cvut.fel.nalida.interpretation.Interpretation;
+import cz.cvut.fel.nalida.interpretation.Interpreter;
+import cz.cvut.fel.nalida.interpretation.Token;
 import cz.cvut.fel.nalida.schema.Attribute;
 import cz.cvut.fel.nalida.schema.Element.ElementType;
 import cz.cvut.fel.nalida.syntax.stanford.SemanticAnnotator;
-import cz.cvut.fel.nalida.tokenization.Attachment;
-import cz.cvut.fel.nalida.tokenization.Token;
-import cz.cvut.fel.nalida.tokenization.Tokenization;
-import cz.cvut.fel.nalida.tokenization.Tokenizer;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -29,22 +29,22 @@ import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations.CollapsedCCProcess
 import edu.stanford.nlp.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.util.CoreMap;
 
-public class StanfordTokenizer implements Tokenizer<Annotation> {
+public class StanfordInterpreter implements Interpreter<Annotation> {
 
 	private static final boolean VALIDATE_BY_TOKENS = true;
 
-	public StanfordTokenizer(Lexicon lexicon) {
+	public StanfordInterpreter(Lexicon lexicon) {
 
 	}
 
 	@Override
-	public Set<Tokenization> getTokenizations(Annotation annotatedLine) {
+	public Set<Interpretation> interpret(Annotation annotatedLine) {
 		Map<Integer, Integer> tokenIndices = new HashMap<Integer, Integer>();
 		List<Set<Token>> tokenSets = createTokenSets(annotatedLine, tokenIndices);
 		Set<List<Token>> tokenLists = Sets.cartesianProduct(tokenSets);
-		Set<Tokenization> tokenizations = createTokenizations(annotatedLine, tokenLists, tokenIndices);
+		Set<Interpretation> interpretations = createInterpretations(annotatedLine, tokenLists, tokenIndices);
 
-		return validateTokenizations(annotatedLine, tokenizations);
+		return validateInterpretations(annotatedLine, interpretations);
 	}
 
 	private List<Set<Token>> createTokenSets(Annotation annotatedLine, Map<Integer, Integer> tokenIndices) {
@@ -69,7 +69,8 @@ public class StanfordTokenizer implements Tokenizer<Annotation> {
 		return tokenSets;
 	}
 
-	private Set<Tokenization> createTokenizations(Annotation annotatedLine, Set<List<Token>> tokenLists, Map<Integer, Integer> tokenIndices) {
+	private Set<Interpretation> createInterpretations(Annotation annotatedLine, Set<List<Token>> tokenLists,
+			Map<Integer, Integer> tokenIndices) {
 		CoreMap sentence = annotatedLine.get(SentencesAnnotation.class).get(0);
 		SemanticGraph dependencyTree = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
 
@@ -84,16 +85,16 @@ public class StanfordTokenizer implements Tokenizer<Annotation> {
 			}
 		}
 
-		Set<Tokenization> tokenizations = new HashSet<>();
+		Set<Interpretation> interpretation = new HashSet<>();
 		Integer root = tokenIndices.get(Integer.valueOf(dependencyTree.getFirstRoot().index()));
 		for (List<Token> tokenList : tokenLists) {
-			tokenizations.add(new Tokenization(tokenList, root, attachmentsTemplate));
+			interpretation.add(new Interpretation(tokenList, root, attachmentsTemplate));
 		}
 
-		return tokenizations;
+		return interpretation;
 	}
 
-	private Set<Tokenization> validateTokenizations(Annotation annotatedLine, Set<Tokenization> tokenizations) {
+	private Set<Interpretation> validateInterpretations(Annotation annotatedLine, Set<Interpretation> interpretations) {
 		CoreMap sentence = annotatedLine.get(SentencesAnnotation.class).get(0);
 		SemanticGraph dependencyTree = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
 		List<CoreLabel> stanfordTokens = sentence.get(TokensAnnotation.class);
@@ -106,22 +107,22 @@ public class StanfordTokenizer implements Tokenizer<Annotation> {
 			}
 		}
 
-		Set<Tokenization> validTokenizations = new HashSet<>();
-		for (Tokenization tokenization : tokenizations) {
-			if (isValidTokenization(words, tokenization) && hasValidAttachments(tokenization)) {
-				validTokenizations.add(tokenization);
+		Set<Interpretation> validInterpretations = new HashSet<>();
+		for (Interpretation interpretation : interpretations) {
+			if (isValidInterpretation(words, interpretation) && hasValidAttachments(interpretation)) {
+				validInterpretations.add(interpretation);
 			}
 		}
 
-		if (validTokenizations.size() == 1 && validTokenizations.iterator().next().getElements().isEmpty()) {
+		if (validInterpretations.size() == 1 && validInterpretations.iterator().next().getElements().isEmpty()) {
 			return Collections.emptySet();
 		}
 
-		return validTokenizations;
+		return validInterpretations;
 	}
 
-	private boolean isValidTokenization(List<String> words, Tokenization tokenization) {
-		ImmutableSet<Token> uniqueTokens = ImmutableSet.copyOf(tokenization.getTokens());
+	private boolean isValidInterpretation(List<String> words, Interpretation interpretation) {
+		ImmutableSet<Token> uniqueTokens = ImmutableSet.copyOf(interpretation.getTokens());
 		for (String word : words) {
 			int occurences = 0;
 			for (Token token : uniqueTokens) {
@@ -136,20 +137,20 @@ public class StanfordTokenizer implements Tokenizer<Annotation> {
 		return true;
 	}
 
-	private boolean hasValidAttachments(Tokenization tokenization) {
+	private boolean hasValidAttachments(Interpretation interpretation) {
 		if (VALIDATE_BY_TOKENS) {
-			return hasValidAttachmentsByTokens(tokenization);
+			return hasValidAttachmentsByTokens(interpretation);
 		} else {
-			return hasValidAttachmentsByAttachments(tokenization);
+			return hasValidAttachmentsByAttachments(interpretation);
 		}
 	}
 
-	private boolean hasValidAttachmentsByTokens(Tokenization tokenization) {
-		for (Token token : tokenization.getTokens()) {
+	private boolean hasValidAttachmentsByTokens(Interpretation interpretation) {
+		for (Token token : interpretation.getTokens()) {
 			boolean valid = false;
 			if (token.isType(ElementType.ENTITY)) {
-				for (Token attached : tokenization.getAttached(token)) {
-					if (token.equals(tokenization.getRoot())
+				for (Token attached : interpretation.getAttached(token)) {
+					if (token.equals(interpretation.getRoot())
 							|| attached.isType(ElementType.WH_WORD)
 							|| (attached.isType(ElementType.VALUE, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE) && attached
 									.getEntityElement().equals(token.getElement()))) {
@@ -159,8 +160,8 @@ public class StanfordTokenizer implements Tokenizer<Annotation> {
 				}
 			} else if (token.isType(ElementType.ATTRIBUTE, ElementType.SUBRESOURCE)) {
 				Attribute attribute = (Attribute) token.getElement();
-				for (Token attached : tokenization.getAttached(token)) {
-					if (token.equals(tokenization.getRoot())
+				for (Token attached : interpretation.getAttached(token)) {
+					if (token.equals(interpretation.getRoot())
 							|| attached.isType(ElementType.WH_WORD)
 							|| (attached.isType(ElementType.VALUE) && attached.getElement().equals(attribute.getValueElement()))
 							|| (attached.isType(ElementType.ENTITY, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE) && attached
@@ -173,22 +174,22 @@ public class StanfordTokenizer implements Tokenizer<Annotation> {
 				valid = true;
 			}
 			if (!valid) {
-				System.out.println("TOKENIZATION : " + tokenization);
-				System.out.println("FAILED TOKEN: " + token + " --- " + tokenization.getAttached(token));
+				System.out.println("INTERPRETATION : " + interpretation);
+				System.out.println("FAILED TOKEN: " + token + " --- " + interpretation.getAttached(token));
 				return false;
 			}
 		}
 		return true;
 	}
 
-	private boolean hasValidAttachmentsByAttachments(Tokenization tokenization) {
-		for (Attachment<Token> attachment : tokenization.getAttachments()) {
+	private boolean hasValidAttachmentsByAttachments(Interpretation interpretation) {
+		for (Attachment<Token> attachment : interpretation.getAttachments()) {
 			Token source = attachment.getSource();
 			Token target = attachment.getTarget();
 			if (!source.isType(ElementType.WH_WORD) && !target.isType(ElementType.WH_WORD)
 					&& !source.getEntityElement().equals(target.getEntityElement()) && !isAttributeOfType(source, target)
 					&& !isAttributeOfType(target, source)) {
-				System.out.println("TOKENIZATION : " + tokenization);
+				System.out.println("INTERPRETATION : " + interpretation);
 				System.out.println("FAILED ATTACH: " + attachment);
 				return false;
 			}

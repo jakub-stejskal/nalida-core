@@ -20,13 +20,13 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
+import cz.cvut.fel.nalida.interpretation.Interpretation;
+import cz.cvut.fel.nalida.interpretation.Token;
 import cz.cvut.fel.nalida.schema.Element;
 import cz.cvut.fel.nalida.schema.Element.ElementType;
 import cz.cvut.fel.nalida.schema.Entity;
 import cz.cvut.fel.nalida.schema.Schema;
 import cz.cvut.fel.nalida.schema.Subresource;
-import cz.cvut.fel.nalida.tokenization.Token;
-import cz.cvut.fel.nalida.tokenization.Tokenization;
 
 abstract public class QueryGenerator {
 	protected final Schema schema;
@@ -35,33 +35,33 @@ abstract public class QueryGenerator {
 	class ElementGraph extends DirectedWeightedMultigraph<Element, DefaultWeightedEdge> {
 
 		private static final long serialVersionUID = 1L;
-		private final List<Element> tokenizationElements;
+		private final List<Element> interpretationElements;
 		private final Set<Entity> entities;
 
 		public ElementGraph(DirectedWeightedMultigraph<Element, DefaultWeightedEdge> graph, List<Element> tokenElements,
 				Set<Entity> entities) {
 			super(new ClassBasedEdgeFactory<Element, DefaultWeightedEdge>(DefaultWeightedEdge.class));
 			Graphs.addGraph(this, graph);
-			this.tokenizationElements = tokenElements;
+			this.interpretationElements = tokenElements;
 			this.entities = entities;
 
 		}
 
 		@Override
 		public double getEdgeWeight(DefaultWeightedEdge e) {
-			boolean sourceInTokens = isInTokens(getEdgeSource(e), this.tokenizationElements, this.entities);
-			boolean targetInTokens = isInTokens(getEdgeTarget(e), this.tokenizationElements, this.entities);
+			boolean sourceInTokens = isInTokens(getEdgeSource(e), this.interpretationElements, this.entities);
+			boolean targetInTokens = isInTokens(getEdgeTarget(e), this.interpretationElements, this.entities);
 			if (sourceInTokens && targetInTokens) {
 				return 0;
 			}
 			return super.getEdgeWeight(e);
 		}
 
-		private boolean isInTokens(Element edgeNode, List<Element> tokenizationElements, Set<Entity> entities) {
+		private boolean isInTokens(Element edgeNode, List<Element> interpretationElements, Set<Entity> entities) {
 			if (edgeNode.isElementType(ElementType.ENTITY)) {
 				return entities.contains(edgeNode);
 			} else {
-				return tokenizationElements.contains(edgeNode);
+				return interpretationElements.contains(edgeNode);
 			}
 		}
 
@@ -72,18 +72,18 @@ abstract public class QueryGenerator {
 		this.props = props;
 	}
 
-	abstract public QueryPlan generateQuery(Tokenization tokenization);
+	abstract public QueryPlan generateQuery(Interpretation interpretation);
 
-	protected Set<Element> getProjectionElements(Tokenization tokenization) {
+	protected Set<Element> getProjectionElements(Interpretation interpretation) {
 
-		Collection<Token> whWordTokens = tokenization.getTokens(ElementType.WH_WORD);
+		Collection<Token> whWordTokens = interpretation.getTokens(ElementType.WH_WORD);
 		if (whWordTokens.isEmpty()) {
-			return Sets.newHashSet(tokenization.getRoot().getElement());
+			return Sets.newHashSet(interpretation.getRoot().getElement());
 		} else {
 
 			Set<Element> elements = new HashSet<>();
-			for (Token whToken : tokenization.getTokens(ElementType.WH_WORD)) {
-				for (Token token : tokenization.getAttached(whToken)) {
+			for (Token whToken : interpretation.getTokens(ElementType.WH_WORD)) {
+				for (Token token : interpretation.getAttached(whToken)) {
 					if (!token.isType(ElementType.WH_WORD)) {
 						elements.add(token.getElement());
 					}
@@ -93,9 +93,9 @@ abstract public class QueryGenerator {
 		}
 	}
 
-	protected Set<Entity> getEntityElements(Tokenization tokenization) {
+	protected Set<Entity> getEntityElements(Interpretation interpretation) {
 		Set<Entity> entities = new HashSet<>();
-		for (Token token : tokenization.getTokens()) {
+		for (Token token : interpretation.getTokens()) {
 			if (!token.isType(ElementType.WH_WORD)) {
 				entities.add(token.getEntityElement());
 			}
@@ -103,8 +103,8 @@ abstract public class QueryGenerator {
 		return entities;
 	}
 
-	protected Set<Token> getConstraintElements(Tokenization tokenization) {
-		return new HashSet<>(tokenization.getTokens(ElementType.VALUE));
+	protected Set<Token> getConstraintElements(Interpretation interpretation) {
+		return new HashSet<>(interpretation.getTokens(ElementType.VALUE));
 	}
 
 	protected Entity getProjectionEntity(Set<Element> projections) {
@@ -136,8 +136,8 @@ abstract public class QueryGenerator {
 		return constraintEntities;
 	}
 
-	protected List<DefaultWeightedEdge> getShortestPath(Tokenization tokenization, Entity projEntity, Set<Entity> constraintEntities) {
-		ElementGraph graph = new ElementGraph(this.schema.getGraph(), tokenization.getElements(), getEntityElements(tokenization));
+	protected List<DefaultWeightedEdge> getShortestPath(Interpretation interpretation, Entity projEntity, Set<Entity> constraintEntities) {
+		ElementGraph graph = new ElementGraph(this.schema.getGraph(), interpretation.getElements(), getEntityElements(interpretation));
 		FloydWarshallShortestPaths<Element, DefaultWeightedEdge> shortestPaths = new FloydWarshallShortestPaths<>(graph);
 		List<Entity> bestOrdering = getBestConstraintEntitiesOrdering(graph, shortestPaths, projEntity, constraintEntities);
 		System.out.println("ORDER: \n " + bestOrdering);

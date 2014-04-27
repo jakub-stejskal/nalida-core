@@ -7,14 +7,14 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.Set;
 
+import cz.cvut.fel.nalida.interpretation.Interpretation;
+import cz.cvut.fel.nalida.interpretation.Interpreter;
 import cz.cvut.fel.nalida.query.QueryPlan;
 import cz.cvut.fel.nalida.query.rest.RestQueryGenerator;
 import cz.cvut.fel.nalida.query.sql.SqlQueryGenerator;
 import cz.cvut.fel.nalida.schema.Schema;
 import cz.cvut.fel.nalida.syntax.stanford.SyntacticAnalysis;
-import cz.cvut.fel.nalida.tokenization.Tokenization;
-import cz.cvut.fel.nalida.tokenization.Tokenizer;
-import cz.cvut.fel.nalida.tokenization.stanford.StanfordTokenizer;
+import cz.cvut.fel.nalida.tokenization.stanford.StanfordInterpreter;
 import edu.stanford.nlp.pipeline.Annotation;
 
 public class Nalida {
@@ -22,7 +22,7 @@ public class Nalida {
 	private static final String SCHEMA_PATH = "data/schema2/";
 	private final Schema schema;
 	private final SyntacticAnalysis syntacticAnalysis;
-	private final Tokenizer<Annotation> tokenizer;
+	private final Interpreter<Annotation> tokenizer;
 	private final RestQueryGenerator restQueryGenerator;
 	private final SqlQueryGenerator sqlQueryGenerator;
 
@@ -37,7 +37,7 @@ public class Nalida {
 		Lexicon lexicon = new Lexicon(this.schema, valuesPath);
 
 		this.syntacticAnalysis = new SyntacticAnalysis(lexicon);
-		this.tokenizer = new StanfordTokenizer(lexicon);
+		this.tokenizer = new StanfordInterpreter(lexicon);
 
 		this.restQueryGenerator = new RestQueryGenerator(this.schema, dbProps);
 		this.sqlQueryGenerator = new SqlQueryGenerator(this.schema, dbProps);
@@ -49,18 +49,18 @@ public class Nalida {
 		return props;
 	}
 
-	public Set<Tokenization> getTokenizations(String query) {
+	public Set<Interpretation> getInterpretations(String query) {
 		Annotation annotatedQuery = this.syntacticAnalysis.process(query);
-		Set<Tokenization> tokenizations = this.tokenizer.getTokenizations(annotatedQuery);
-		return tokenizations;
+		Set<Interpretation> interpretations = this.tokenizer.interpret(annotatedQuery);
+		return interpretations;
 	}
 
-	public QueryPlan getRestQuery(Tokenization tokenization) {
-		return this.restQueryGenerator.generateQuery(tokenization);
+	public QueryPlan getRestQuery(Interpretation interpretation) {
+		return this.restQueryGenerator.generateQuery(interpretation);
 	}
 
-	public QueryPlan getSqlQuery(Tokenization tokenization) {
-		return this.sqlQueryGenerator.generateQuery(tokenization);
+	public QueryPlan getSqlQuery(Interpretation interpretation) {
+		return this.sqlQueryGenerator.generateQuery(interpretation);
 	}
 
 	public Schema getSchema() {

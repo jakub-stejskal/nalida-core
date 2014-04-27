@@ -22,6 +22,8 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import cz.cvut.fel.nalida.interpretation.Interpretation;
+import cz.cvut.fel.nalida.interpretation.Interpreter;
 import cz.cvut.fel.nalida.query.QueryGenerator;
 import cz.cvut.fel.nalida.query.QueryPlan;
 import cz.cvut.fel.nalida.query.rest.RestQueryGenerator;
@@ -29,9 +31,7 @@ import cz.cvut.fel.nalida.query.sql.SqlQueryGenerator;
 import cz.cvut.fel.nalida.schema.Schema;
 import cz.cvut.fel.nalida.syntax.stanford.SemanticAnnotator;
 import cz.cvut.fel.nalida.syntax.stanford.SyntacticAnalysis;
-import cz.cvut.fel.nalida.tokenization.Tokenization;
-import cz.cvut.fel.nalida.tokenization.Tokenizer;
-import cz.cvut.fel.nalida.tokenization.stanford.StanfordTokenizer;
+import cz.cvut.fel.nalida.tokenization.stanford.StanfordInterpreter;
 import cz.cvut.fel.nalida.util.GraphDisplay;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
@@ -51,7 +51,7 @@ public class Main {
 	static Scanner in = new Scanner(System.in);
 
 	private static SyntacticAnalysis syntacticAnalysis;
-	private static Tokenizer<Annotation> tokenizer;
+	private static Interpreter<Annotation> interpreter;
 	private static QueryGenerator queryGenerator;
 	private static Lexicon lexicon;
 	private static CommandLine cli;
@@ -129,18 +129,18 @@ public class Main {
 
 		Annotation annotatedLine = syntacticAnalysis.process(line);
 		//				printSyntacticInfo(annotatedLine);
-		Set<Tokenization> tokenizations = tokenizer.getTokenizations(annotatedLine);
-		//			printSemanticInfo(tokenizations);
-		Tokenization tokenization = pickTokenization(tokenizations);
-		System.out.println("Selected tokenization: ");
+		Set<Interpretation> interpretations = interpreter.interpret(annotatedLine);
+		//			printSemanticInfo(interpretations);
+		Interpretation interpretation = pickInterpretation(interpretations);
+		System.out.println("Selected interpretation: ");
 
-		if (tokenization == null) {
+		if (interpretation == null) {
 			System.out.println("Failed to translate query.");
 			return;
 		}
-		System.out.println(tokenization);
+		System.out.println(interpretation);
 
-		QueryPlan queryPlan = queryGenerator.generateQuery(tokenization);
+		QueryPlan queryPlan = queryGenerator.generateQuery(interpretation);
 		System.out.println("Generated query:");
 		System.out.println(queryPlan);
 		System.out.println();
@@ -163,7 +163,7 @@ public class Main {
 		}
 
 		syntacticAnalysis = new SyntacticAnalysis(lexicon);
-		tokenizer = new StanfordTokenizer(lexicon);
+		interpreter = new StanfordInterpreter(lexicon);
 
 		Properties props = new Properties();
 		props.load(Main.class.getClassLoader().getResourceAsStream("db.properties"));
@@ -175,28 +175,28 @@ public class Main {
 		}
 	}
 
-	private static Tokenization pickTokenization(Set<Tokenization> tokenizations) throws IOException {
-		System.out.println("pickTokenization: " + tokenizations.size());
-		if (tokenizations.size() == 1) {
-			Tokenization tokenization = tokenizations.iterator().next();
-			if (tokenization.getElements().isEmpty()) {
+	private static Interpretation pickInterpretation(Set<Interpretation> interpretations) throws IOException {
+		System.out.println("pickInterpretation: " + interpretations.size());
+		if (interpretations.size() == 1) {
+			Interpretation interpretation = interpretations.iterator().next();
+			if (interpretation.getElements().isEmpty()) {
 				return null;
 			} else {
-				return tokenization;
+				return interpretation;
 			}
-		} else if (tokenizations.size() == 0) {
+		} else if (interpretations.size() == 0) {
 			return null;
 		}
 
-		List<Tokenization> tokList = new ArrayList<>(tokenizations);
-		Collections.sort(tokList, new Comparator<Tokenization>() {
+		List<Interpretation> tokList = new ArrayList<>(interpretations);
+		Collections.sort(tokList, new Comparator<Interpretation>() {
 			@Override
-			public int compare(Tokenization o1, Tokenization o2) {
+			public int compare(Interpretation o1, Interpretation o2) {
 				return o1.getTokens().toString().compareTo(o2.getTokens().toString());
 			}
 		});
 
-		System.out.println("Choose correct tokenization:");
+		System.out.println("Choose correct interpretation:");
 		for (int i = 0; i < tokList.size(); i++) {
 			System.out.println(i + ": " + tokList.get(i).getTokens() + "(" + i + ")");
 		}
@@ -259,10 +259,10 @@ public class Main {
 
 	}
 
-	public static void printSemanticInfo(Set<Tokenization> tokenizations) {
-		System.out.println("Tokenizations: \n");
-		for (Tokenization tokenization : tokenizations) {
-			System.out.println(tokenization);
+	public static void printSemanticInfo(Set<Interpretation> interpretations) {
+		System.out.println("Interpretations: \n");
+		for (Interpretation interpretation : interpretations) {
+			System.out.println(interpretation);
 			System.out.println();
 		}
 	}

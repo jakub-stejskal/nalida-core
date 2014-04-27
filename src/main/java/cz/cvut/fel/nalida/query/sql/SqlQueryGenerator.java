@@ -13,14 +13,14 @@ import org.jgrapht.graph.DirectedWeightedMultigraph;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 
+import cz.cvut.fel.nalida.interpretation.Interpretation;
+import cz.cvut.fel.nalida.interpretation.Token;
 import cz.cvut.fel.nalida.query.QueryGenerator;
 import cz.cvut.fel.nalida.query.QueryPlan;
 import cz.cvut.fel.nalida.schema.Element;
 import cz.cvut.fel.nalida.schema.Element.ElementType;
 import cz.cvut.fel.nalida.schema.Entity;
 import cz.cvut.fel.nalida.schema.Schema;
-import cz.cvut.fel.nalida.tokenization.Token;
-import cz.cvut.fel.nalida.tokenization.Tokenization;
 
 public class SqlQueryGenerator extends QueryGenerator {
 
@@ -29,11 +29,11 @@ public class SqlQueryGenerator extends QueryGenerator {
 	}
 
 	@Override
-	public QueryPlan generateQuery(Tokenization tokenization) {
-		Set<String> entities = getEntities(tokenization);
-		Set<String> projection = getProjection(tokenization);
-		Set<String> constraints = getConstraints(tokenization);
-		Set<String> joins = getJoinConstraints(tokenization);
+	public QueryPlan generateQuery(Interpretation interpretation) {
+		Set<String> entities = getEntities(interpretation);
+		Set<String> projection = getProjection(interpretation);
+		Set<String> constraints = getConstraints(interpretation);
+		Set<String> joins = getJoinConstraints(interpretation);
 		SqlQuery query = new SqlQuery(entities, projection, Sets.union(constraints, joins));
 
 		QueryPlan qp = new QueryPlan();
@@ -41,26 +41,26 @@ public class SqlQueryGenerator extends QueryGenerator {
 		return qp;
 	}
 
-	private Set<String> getEntities(Tokenization tokenization) {
+	private Set<String> getEntities(Interpretation interpretation) {
 		Set<String> entities = new HashSet<>();
-		for (Entity entityElement : getEntityElements(tokenization)) {
+		for (Entity entityElement : getEntityElements(interpretation)) {
 			entities.add(entityElement.getName());
 		}
 		return entities;
 	}
 
-	private Set<String> getProjection(Tokenization tokenization) {
+	private Set<String> getProjection(Interpretation interpretation) {
 		Set<String> projection = new HashSet<>();
-		for (Element projElement : getProjectionElements(tokenization)) {
+		for (Element projElement : getProjectionElements(interpretation)) {
 			String attributeName = projElement.isElementType(ElementType.ENTITY) ? "*" : projElement.getName();
 			projection.add(projElement.toEntityElement().getName() + "." + attributeName);
 		}
 		return projection;
 	}
 
-	private Set<String> getConstraints(Tokenization tokenization) {
+	private Set<String> getConstraints(Interpretation interpretation) {
 		Set<String> constraints = new HashSet<>();
-		for (Token constrToken : getConstraintElements(tokenization)) {
+		for (Token constrToken : getConstraintElements(interpretation)) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(constrToken.getEntityElement().getName() + "." + constrToken.getElementName());
 			sb.append(" LIKE '%");
@@ -71,13 +71,13 @@ public class SqlQueryGenerator extends QueryGenerator {
 		return constraints;
 	}
 
-	private Set<String> getJoinConstraints(Tokenization tokenization) {
-		Set<Element> projections = getProjectionElements(tokenization);
-		Set<Token> constraints = getConstraintElements(tokenization);
+	private Set<String> getJoinConstraints(Interpretation interpretation) {
+		Set<Element> projections = getProjectionElements(interpretation);
+		Set<Token> constraints = getConstraintElements(interpretation);
 		Entity projectionEntity = getProjectionEntity(projections);
 		Set<Entity> constraintEntities = getConstraintEntities(constraints, projectionEntity);
 
-		List<DefaultWeightedEdge> path = getShortestPath(tokenization, projectionEntity, constraintEntities);
+		List<DefaultWeightedEdge> path = getShortestPath(interpretation, projectionEntity, constraintEntities);
 		System.out.println("PATH: " + path);
 		return getJoins(path);
 	}

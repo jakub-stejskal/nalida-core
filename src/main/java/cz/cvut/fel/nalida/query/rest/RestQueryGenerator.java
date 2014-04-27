@@ -11,6 +11,8 @@ import org.jgrapht.graph.DirectedWeightedMultigraph;
 
 import com.google.common.collect.Iterables;
 
+import cz.cvut.fel.nalida.interpretation.Interpretation;
+import cz.cvut.fel.nalida.interpretation.Token;
 import cz.cvut.fel.nalida.query.QueryGenerator;
 import cz.cvut.fel.nalida.query.QueryPlan;
 import cz.cvut.fel.nalida.schema.Attribute;
@@ -19,8 +21,6 @@ import cz.cvut.fel.nalida.schema.Element.ElementType;
 import cz.cvut.fel.nalida.schema.Entity;
 import cz.cvut.fel.nalida.schema.Schema;
 import cz.cvut.fel.nalida.schema.Value;
-import cz.cvut.fel.nalida.tokenization.Token;
-import cz.cvut.fel.nalida.tokenization.Tokenization;
 
 public class RestQueryGenerator extends QueryGenerator {
 
@@ -30,13 +30,13 @@ public class RestQueryGenerator extends QueryGenerator {
 	}
 
 	@Override
-	public QueryPlan generateQuery(Tokenization tokenization) {
-		Set<Element> projections = getProjectionElements(tokenization);
-		Set<Token> constraints = getConstraintElements(tokenization);
+	public QueryPlan generateQuery(Interpretation interpretation) {
+		Set<Element> projections = getProjectionElements(interpretation);
+		Set<Token> constraints = getConstraintElements(interpretation);
 		Entity projectionEntity = getProjectionEntity(projections);
 		Set<Entity> constraintEntity = getConstraintEntities(constraints, projectionEntity);
 		DirectedWeightedMultigraph<Element, DefaultWeightedEdge> graph = this.schema.getGraph();
-		List<DefaultWeightedEdge> path = getShortestPath(tokenization, projectionEntity, constraintEntity);
+		List<DefaultWeightedEdge> path = getShortestPath(interpretation, projectionEntity, constraintEntity);
 
 		QueryPlan plan = new QueryPlan();
 		RestQueryBuilder query = new RestQueryBuilder(this.props);

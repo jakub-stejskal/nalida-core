@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida.tokenization;
+package cz.cvut.fel.nalida.interpretation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,12 +12,12 @@ import com.google.common.collect.Collections2;
 import cz.cvut.fel.nalida.schema.Element;
 import cz.cvut.fel.nalida.schema.Element.ElementType;
 
-public class Tokenization {
+public class Interpretation {
 	final protected Set<Attachment<Token>> attachments;
 	final protected List<Token> tokens;
 	final protected Token root;
 
-	public Tokenization(List<Token> tokenList, Integer root, Set<Attachment<Integer>> attachmentsTemplate) {
+	public Interpretation(List<Token> tokenList, Integer root, Set<Attachment<Integer>> attachmentsTemplate) {
 		this.tokens = tokenList;
 		this.attachments = createAttachments(attachmentsTemplate);
 		this.root = (root == null) ? null : this.tokens.get(root.intValue());

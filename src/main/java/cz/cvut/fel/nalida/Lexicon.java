@@ -13,12 +13,12 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
+import cz.cvut.fel.nalida.interpretation.Token;
 import cz.cvut.fel.nalida.schema.Attribute;
 import cz.cvut.fel.nalida.schema.Element;
 import cz.cvut.fel.nalida.schema.Entity;
 import cz.cvut.fel.nalida.schema.Schema;
 import cz.cvut.fel.nalida.syntax.stanford.Lemmatizer;
-import cz.cvut.fel.nalida.tokenization.Token;
 
 public class Lexicon {
 

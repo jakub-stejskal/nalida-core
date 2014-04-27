@@ -8,7 +8,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import cz.cvut.fel.nalida.Lexicon;
-import cz.cvut.fel.nalida.tokenization.Token;
+import cz.cvut.fel.nalida.interpretation.Token;
 import edu.stanford.nlp.ling.CoreAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
