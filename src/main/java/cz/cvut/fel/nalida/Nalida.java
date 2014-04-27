@@ -19,6 +19,7 @@ import edu.stanford.nlp.pipeline.Annotation;
 
 public class Nalida {
 
+	private static final String SCHEMA_PATH = "data/schema2/";
 	private final Schema schema;
 	private final SyntacticAnalysis syntacticAnalysis;
 	private final Tokenizer<Annotation> tokenizer;
@@ -26,7 +27,7 @@ public class Nalida {
 	private final SqlQueryGenerator sqlQueryGenerator;
 
 	public Nalida() throws IOException {
-		this(loadPropsFromFile("db.properties"), "data/schema/schema.desc", "data/schema/");
+		this(loadPropsFromFile("db.properties"), SCHEMA_PATH + "schema.desc", SCHEMA_PATH);
 	}
 
 	public Nalida(Properties dbProps, String schemaPath, String valuesPath) throws IOException {

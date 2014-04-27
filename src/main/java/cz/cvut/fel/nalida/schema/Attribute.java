@@ -56,7 +56,11 @@ public class Attribute extends Element {
 	}
 
 	public boolean isPrimitiveType() {
-		return this.type.equals("string") || this.type.equals("integer");
+		return this.type.equals("string") || this.type.equals("integer") || this.type.equals("enum");
+	}
+
+	public boolean isPrimitiveType(String type) {
+		return this.type.equals(type);
 	}
 
 	public boolean isCollectionType() {

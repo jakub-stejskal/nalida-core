@@ -24,7 +24,7 @@ entities:
         type:   Division
         tokens: [division, department, work, employ]
       - name:   supervisionPhDStudents
-        type:   string
+        type:   enum
         tokens: [supervision]
     subresources:
       - name:   courses
@@ -123,10 +123,10 @@ entities:
         type:   integer
         tokens: [occupy]
       - name:   code
-        type:   string
+        type:   integer
         tokens: [code]
       - name: parallelType
-        type: string
+        type: enum
         tokens: [type]
       - name:   course
         type:   Course

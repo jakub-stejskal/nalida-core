@@ -18,6 +18,7 @@ import cz.cvut.fel.nalida.schema.Element;
 import cz.cvut.fel.nalida.schema.Element.ElementType;
 import cz.cvut.fel.nalida.schema.Entity;
 import cz.cvut.fel.nalida.schema.Schema;
+import cz.cvut.fel.nalida.schema.Value;
 import cz.cvut.fel.nalida.tokenization.Token;
 import cz.cvut.fel.nalida.tokenization.Tokenization;
 
@@ -60,6 +61,7 @@ public class RestQueryGenerator extends QueryGenerator {
 					addConstraints(query, "", entity, constraints);
 					plan.addQuery(query.build());
 					query = new RestQueryBuilder(this.props);
+					query.resource(target.getName() + "/");
 				} else {
 					throw new UnsupportedOperationException("Unsupported connection: " + edge);
 				}
@@ -93,9 +95,19 @@ public class RestQueryGenerator extends QueryGenerator {
 	private void addConstraints(RestQueryBuilder query, String constrAttribute, Entity constrEntity, Set<Token> constraints) {
 		for (Token constrToken : constraints) {
 			if (constrToken.getEntityElement().equals(constrEntity)) {
-				query.constraint(constrAttribute + constrToken.getElementName(), "==",
-						Iterables.toArray(constrToken.getWords(), String.class));
+				if (!isTokenOfAttrType(constrToken, "string")) {
+					assert constrToken.getWords().size() == 1;
+					query.constraintExact(constrAttribute + constrToken.getElementName(), "==", constrToken.getWords().get(0).toUpperCase());
+				} else {
+					query.constraint(constrAttribute + constrToken.getElementName(), "==",
+							Iterables.toArray(constrToken.getWords(), String.class));
+				}
+
 			}
 		}
+	}
+
+	private boolean isTokenOfAttrType(Token constrToken, String type) {
+		return constrToken.isType(ElementType.VALUE) && ((Value) constrToken.getElement()).getAttribute().isPrimitiveType(type);
 	}
 }

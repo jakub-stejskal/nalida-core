@@ -62,6 +62,11 @@ public class RestQueryBuilder {
 		return this;
 	}
 
+	public RestQueryBuilder constraintExact(String attribute, String operator, String value) {
+		this.constraints.put(attribute, operator + value);
+		return this;
+	}
+
 	public RestQueryBuilder offset(int offset) {
 		this.offset = offset;
 		return this;
