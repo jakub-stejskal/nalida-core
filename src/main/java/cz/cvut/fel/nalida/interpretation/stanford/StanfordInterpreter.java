@@ -1,4 +1,4 @@
-package cz.cvut.fel.nalida.tokenization.stanford;
+package cz.cvut.fel.nalida.interpretation.stanford;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,7 +109,7 @@ public class StanfordInterpreter implements Interpreter<Annotation> {
 
 		Set<Interpretation> validInterpretations = new HashSet<>();
 		for (Interpretation interpretation : interpretations) {
-			if (isValidInterpretation(words, interpretation) && hasValidAttachments(interpretation)) {
+			if (isValidTokenization(words, interpretation) && hasValidAttachments(interpretation)) {
 				validInterpretations.add(interpretation);
 			}
 		}
@@ -121,7 +121,7 @@ public class StanfordInterpreter implements Interpreter<Annotation> {
 		return validInterpretations;
 	}
 
-	private boolean isValidInterpretation(List<String> words, Interpretation interpretation) {
+	private boolean isValidTokenization(List<String> words, Interpretation interpretation) {
 		ImmutableSet<Token> uniqueTokens = ImmutableSet.copyOf(interpretation.getTokens());
 		for (String word : words) {
 			int occurences = 0;

@@ -9,12 +9,12 @@ import java.util.Set;
 
 import cz.cvut.fel.nalida.interpretation.Interpretation;
 import cz.cvut.fel.nalida.interpretation.Interpreter;
+import cz.cvut.fel.nalida.interpretation.stanford.StanfordInterpreter;
 import cz.cvut.fel.nalida.query.QueryPlan;
 import cz.cvut.fel.nalida.query.rest.RestQueryGenerator;
 import cz.cvut.fel.nalida.query.sql.SqlQueryGenerator;
 import cz.cvut.fel.nalida.schema.Schema;
 import cz.cvut.fel.nalida.syntax.stanford.SyntacticAnalysis;
-import cz.cvut.fel.nalida.tokenization.stanford.StanfordInterpreter;
 import edu.stanford.nlp.pipeline.Annotation;
 
 public class Nalida {

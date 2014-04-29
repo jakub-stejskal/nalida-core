@@ -24,6 +24,7 @@ import org.apache.commons.cli.ParseException;
 
 import cz.cvut.fel.nalida.interpretation.Interpretation;
 import cz.cvut.fel.nalida.interpretation.Interpreter;
+import cz.cvut.fel.nalida.interpretation.stanford.StanfordInterpreter;
 import cz.cvut.fel.nalida.query.QueryGenerator;
 import cz.cvut.fel.nalida.query.QueryPlan;
 import cz.cvut.fel.nalida.query.rest.RestQueryGenerator;
@@ -31,7 +32,6 @@ import cz.cvut.fel.nalida.query.sql.SqlQueryGenerator;
 import cz.cvut.fel.nalida.schema.Schema;
 import cz.cvut.fel.nalida.syntax.stanford.SemanticAnnotator;
 import cz.cvut.fel.nalida.syntax.stanford.SyntacticAnalysis;
-import cz.cvut.fel.nalida.tokenization.stanford.StanfordInterpreter;
 import cz.cvut.fel.nalida.util.GraphDisplay;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
@@ -46,7 +46,7 @@ import edu.stanford.nlp.util.CoreMap;
 public class Main {
 
 	private static final String QUERIES_FILE = "data/dev.txt";
-	private static final String DATA_PATH = "data/schema2/";
+	private static final String DATA_PATH = "data/schema/";
 	private static final String SCHEMA_FILENAME = "schema.desc";
 	static Scanner in = new Scanner(System.in);
 
