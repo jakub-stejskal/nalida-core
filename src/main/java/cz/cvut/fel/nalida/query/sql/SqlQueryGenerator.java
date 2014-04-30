@@ -62,10 +62,20 @@ public class SqlQueryGenerator extends QueryGenerator {
 		Set<String> constraints = new HashSet<>();
 		for (Token constrToken : getConstraintElements(interpretation)) {
 			StringBuilder sb = new StringBuilder();
-			sb.append(constrToken.getEntityElement().getName() + "." + constrToken.getElementName());
-			sb.append(" LIKE '%");
-			sb.append(Joiner.on("%").join(constrToken.getWords()));
-			sb.append("%'");
+			if (isTokenOfAttrType(constrToken, "string")) {
+				sb.append(constrToken.getEntityElement().getName());
+				sb.append(".");
+				sb.append(constrToken.getElementName());
+				sb.append(" LIKE '%");
+				sb.append(Joiner.on("%").join(constrToken.getWords()));
+				sb.append("%'");
+			} else {
+				sb.append(constrToken.getEntityElement().getName());
+				sb.append(".");
+				sb.append(constrToken.getElementName());
+				sb.append("=");
+				sb.append(constrToken.getWords().get(0).toUpperCase());
+			}
 			constraints.add(sb.toString());
 		}
 		return constraints;

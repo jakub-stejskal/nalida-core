@@ -27,6 +27,7 @@ import cz.cvut.fel.nalida.schema.Element.ElementType;
 import cz.cvut.fel.nalida.schema.Entity;
 import cz.cvut.fel.nalida.schema.Schema;
 import cz.cvut.fel.nalida.schema.Subresource;
+import cz.cvut.fel.nalida.schema.Value;
 
 abstract public class QueryGenerator {
 	protected final Schema schema;
@@ -188,5 +189,9 @@ abstract public class QueryGenerator {
 			source = target;
 		}
 		return shortestPath;
+	}
+
+	protected boolean isTokenOfAttrType(Token constrToken, String type) {
+		return constrToken.isType(ElementType.VALUE) && ((Value) constrToken.getElement()).getAttribute().isPrimitiveType(type);
 	}
 }

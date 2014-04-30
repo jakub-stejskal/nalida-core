@@ -20,7 +20,6 @@ import cz.cvut.fel.nalida.schema.Element;
 import cz.cvut.fel.nalida.schema.Element.ElementType;
 import cz.cvut.fel.nalida.schema.Entity;
 import cz.cvut.fel.nalida.schema.Schema;
-import cz.cvut.fel.nalida.schema.Value;
 
 public class RestQueryGenerator extends QueryGenerator {
 
@@ -102,12 +101,7 @@ public class RestQueryGenerator extends QueryGenerator {
 					query.constraint(constrAttribute + constrToken.getElementName(), "==",
 							Iterables.toArray(constrToken.getWords(), String.class));
 				}
-
 			}
 		}
-	}
-
-	private boolean isTokenOfAttrType(Token constrToken, String type) {
-		return constrToken.isType(ElementType.VALUE) && ((Value) constrToken.getElement()).getAttribute().isPrimitiveType(type);
 	}
 }
