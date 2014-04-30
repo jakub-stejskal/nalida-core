@@ -18,7 +18,7 @@ import org.yaml.snakeyaml.Yaml;
 @XmlRootElement
 public final class Schema {
 	private static final int DIRECT_EDGE_WEIGHT = 1;
-	private static final double UNDIRECT_EDGE_WEIGHT = 1.1;
+	private static final double INDIRECT_EDGE_WEIGHT = 1.1;
 	private String baseUri;
 	private List<Entity> entities;
 	private DirectedWeightedMultigraph<Element, DefaultWeightedEdge> graph;
@@ -115,7 +115,7 @@ public final class Schema {
 					Entity type = attribute.getTypeEntity();
 					this.graph.addVertex(attribute);
 					this.graph.setEdgeWeight(this.graph.addEdge(entity, attribute), DIRECT_EDGE_WEIGHT);
-					this.graph.setEdgeWeight(this.graph.addEdge(attribute, type), UNDIRECT_EDGE_WEIGHT);
+					this.graph.setEdgeWeight(this.graph.addEdge(attribute, type), INDIRECT_EDGE_WEIGHT);
 
 					if (!attribute.isCollectionType()) {
 						this.graph.setEdgeWeight(this.graph.addEdge(attribute, entity), DIRECT_EDGE_WEIGHT);
@@ -128,7 +128,7 @@ public final class Schema {
 					Entity type = attribute.getTypeEntity();
 					this.graph.addVertex(attribute);
 					this.graph.setEdgeWeight(this.graph.addEdge(entity, attribute), DIRECT_EDGE_WEIGHT);
-					this.graph.setEdgeWeight(this.graph.addEdge(attribute, type), UNDIRECT_EDGE_WEIGHT);
+					this.graph.setEdgeWeight(this.graph.addEdge(attribute, type), INDIRECT_EDGE_WEIGHT);
 				}
 			}
 		}

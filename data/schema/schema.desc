@@ -10,10 +10,10 @@ entities:
         tokens: [username]
       - name:   firstName
         type:   string
-        tokens: [name]
+        tokens: [name, first name]
       - name:   lastName
         type:   string
-        tokens: [name, surname]
+        tokens: [name, last name, surname]
       - name:   phone
         type:   string
         tokens: [phone, phone number]
