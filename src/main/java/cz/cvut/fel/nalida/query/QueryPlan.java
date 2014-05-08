@@ -1,10 +1,11 @@
 package cz.cvut.fel.nalida.query;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
 
 public class QueryPlan {
 	List<Query> queries = new ArrayList<>();
@@ -14,9 +15,12 @@ public class QueryPlan {
 	}
 
 	public String execute() throws Exception {
-		List<String> queryParams = Collections.emptyList();
+		Set<String> queryParams = Sets.newHashSet("");
 		String queryResponse = null;
 		for (Query query : this.queries) {
+			if (queryParams.isEmpty()) {
+				return "Constraints of the query not satisfied: " + query;
+			}
 			queryResponse = query.execute(queryParams);
 			queryParams = query.projectReference(queryResponse);
 		}

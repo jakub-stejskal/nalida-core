@@ -47,8 +47,9 @@ import edu.stanford.nlp.util.CoreMap;
 public class Main {
 
 	private static final String QUERIES_FILE = "data/dev.txt";
-	private static final String DATA_PATH = "data/schema/";
+	private static final String DATA_PATH = "data/schema3/";
 	private static final String SCHEMA_FILENAME = "schema.desc";
+	public static boolean PRINT_FILTERING = false;
 	static Scanner in = new Scanner(System.in);
 
 	private static SyntacticAnalysis syntacticAnalysis;
@@ -65,10 +66,12 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 
 		parseArguments(args);
-		initializeModules();
+		initializeComponents();
 
-		System.out.println(schema);
-		System.out.println(lexicon);
+		if (cli.hasOption("verbose")) {
+			System.out.println(schema);
+			System.out.println(lexicon);
+		}
 
 		if (cli.hasOption("query")) {
 			processSentence(cli.getOptionValue("query"));
@@ -84,7 +87,7 @@ public class Main {
 			while ((line = br.readLine()) != null) {
 				try {
 					processSentence(line);
-				} catch (Exception e) {
+				} catch (Error e) {
 					e.printStackTrace(System.out);
 				}
 			}
@@ -125,37 +128,57 @@ public class Main {
 			return;
 		}
 
-		System.out.println("\n XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
-		System.out.println(line);
-
 		Annotation annotatedLine = syntacticAnalysis.process(line);
-		//				printSyntacticInfo(annotatedLine);
+		if (cli.hasOption("verbose")) {
+			System.out.println("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
+			System.out.println("INPUT:" + line);
+		}
+		double startTime = System.currentTimeMillis();
 		Set<Interpretation> interpretations = interpreter.interpret(annotatedLine);
-		//			printSemanticInfo(interpretations);
+		double interpretationTime = System.currentTimeMillis();
+		if (cli.hasOption("verbose")) {
+			System.out.println("TIME-INT:" + (interpretationTime - startTime));
+		}
 		Interpretation interpretation = pickInterpretation(interpretations);
-		System.out.println("Selected interpretation: ");
-
+		double pickTime = System.currentTimeMillis();
+		printSyntacticInfo(annotatedLine);
 		if (interpretation == null) {
-			System.out.println("Failed to translate query.");
+			System.out.println("Failed to translate query:" + line);
+			if (cli.hasOption("verbose")) {
+				printSyntacticInfo(annotatedLine);
+			}
 			return;
 		}
-		System.out.println(interpretation);
-
+		if (cli.hasOption("verbose")) {
+			System.out.println("Selected interpretation: ");
+			System.out.println(interpretation);
+		}
 		QueryPlan queryPlan = queryGenerator.generateQuery(interpretation);
-		System.out.println("Generated query:");
-		System.out.println(queryPlan);
-		System.out.println();
-
+		double queryGenTime = System.currentTimeMillis();
+		if (cli.hasOption("verbose")) {
+			System.out.println("TIME-QPG:" + (queryGenTime - pickTime));
+		}
+		if (cli.hasOption("verbose") || cli.hasOption("dry-run")) {
+			System.out.println("Generated query:");
+			System.out.println(queryPlan);
+			System.out.println();
+		}
 		if (!cli.hasOption("dry-run")) {
 			try {
 				System.out.println(queryPlan.execute());
 			} catch (Exception e) {
-				e.printStackTrace(System.out);
+				System.out.println("Failed to execute the query plan: " + e.getMessage());
 			}
+		}
+		double endPlanTime = System.currentTimeMillis();
+		if (cli.hasOption("verbose")) {
+			System.out.println("TIME-EXE:" + (endPlanTime - queryGenTime));
+			System.out.println("TIME-CMP:" + ((interpretationTime - startTime) + (queryGenTime - pickTime)));
+			System.out.println("TIME-TOT:" + ((interpretationTime - startTime) + (queryGenTime - pickTime) + (endPlanTime - queryGenTime)));
 		}
 	}
 
-	private static void initializeModules() throws IOException {
+	private static void initializeComponents() throws IOException {
 		InputStream input = new FileInputStream(new File(DATA_PATH + SCHEMA_FILENAME));
 		schema = Schema.load(input);
 		lexicon = new Lexicon(new StanfordLemmatizer(), schema, DATA_PATH);
@@ -177,7 +200,9 @@ public class Main {
 	}
 
 	private static Interpretation pickInterpretation(Set<Interpretation> interpretations) throws IOException {
-		System.out.println("pickInterpretation: " + interpretations.size());
+		if (cli.hasOption("verbose")) {
+			System.out.println("INT#:" + interpretations.size());
+		}
 		if (interpretations.size() == 1) {
 			Interpretation interpretation = interpretations.iterator().next();
 			if (interpretation.getElements().isEmpty()) {
@@ -207,32 +232,16 @@ public class Main {
 	}
 
 	public static void printSyntacticInfo(Annotation document) {
-		// these are all the sentences in this document
-		// a CoreMap is essentially a Map that uses class objects as keys and has values with custom types
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
 		for (CoreMap sentence : sentences) {
-
 			System.out.println(sentence.get(TextAnnotation.class));
 			System.out.println();
 
-			//					System.out.println(sentence.keySet());
-			//					System.out.println(sentence.get(TokensAnnotation.class).get(0).keySet());
-
-			// traversing the words in the current sentence
-			// a CoreLabel is a CoreMap with additional token-specific methods
 			for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
-
-				//				System.out.println(token.toShortString("Text", "PartOfSpeech", "Lemma", "NamedEntityTag", "Utterance", "Speaker"));
 				System.out.println(token.word() + " - " + token.lemma() + " - " + token.get(SemanticAnnotator.class));
 			}
 			System.out.println();
 
-			//			// this is the parse tree of the current sentence
-			//			Tree tree = sentence.get(TreeAnnotation.class);
-			//			System.out.println("tree:  \n" + tree);
-			//			System.out.println();
-
-			// this is the Stanford dependency graph of the current sentence
 			SemanticGraph dependencies = sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
 			System.out.println("dependencies: \n" + dependencies);
 			for (SemanticGraphEdge edge : dependencies.edgeListSorted()) {
@@ -240,24 +249,6 @@ public class Main {
 			}
 			System.out.println();
 		}
-
-		//		// This is the coreference link graph
-		//		// Each chain stores a set of mentions that link to each other,
-		//		// along with a method for getting the most representative mention
-		//		// Both sentence and token offsets start at 1!
-		//		Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class);
-		//		System.out.println("graph: \n" + graph);
-		//		System.out.println();
-		//
-		//		// SUTime annotations
-		//		List<CoreMap> timexAnnsAll = document.get(TimeAnnotations.TimexAnnotations.class);
-		//		for (CoreMap cm : timexAnnsAll) {
-		//			List<CoreLabel> tokens = cm.get(CoreAnnotations.TokensAnnotation.class);
-		//			System.out.println(cm + " [from char offset " + tokens.get(0).get(CoreAnnotations.CharacterOffsetBeginAnnotation.class) + " to "
-		//					+ tokens.get(tokens.size() - 1).get(CoreAnnotations.CharacterOffsetEndAnnotation.class) + ']' + " --> "
-		//					+ cm.get(TimeExpression.Annotation.class).getTemporal());
-		//		}
-
 	}
 
 	public static void printSemanticInfo(Set<Interpretation> interpretations) {

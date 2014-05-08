@@ -62,6 +62,7 @@ public class RestQuery implements Query {
 		m.put("limit", Lists.newArrayList(String.valueOf(this.limit)));
 		m.put("offset", Lists.newArrayList(String.valueOf(this.offset)));
 		m.put("sem", Lists.newArrayList("current,next"));
+		m.put("detail", Lists.newArrayList("1"));
 		return m;
 	}
 
@@ -88,14 +89,10 @@ public class RestQuery implements Query {
 	}
 
 	@Override
-	public String execute(List<String> ids) throws Exception {
+	public String execute(Set<String> ids) throws Exception {
 		List<XmlParser> responses = new ArrayList<>();
-		if (ids.isEmpty()) {
-			responses.add(execute(""));
-		} else {
-			for (String id : ids) {
-				responses.add(execute(id));
-			}
+		for (String id : ids) {
+			responses.add(execute(id));
 		}
 		return XmlParser.combineDocuments(responses).toString();
 	}
@@ -107,14 +104,14 @@ public class RestQuery implements Query {
 		if (response.getStatus() != 200) {
 			System.out.println("Query.execute.response: " + response.getEntity(String.class));
 			System.out.println();
-			throw new Exception("Failed : HTTP error code : " + response.getStatus() + " - " + response.getStatusInfo() + ", URL:"
-					+ this.webResource.getURI());
+			throw new Exception("HTTP request failed: " + response.getStatus() + " - " + response.getStatusInfo() + " - "
+					+ response.getEntity(String.class) + ", URL:" + this.webResource.getURI());
 		}
 		return new XmlParser(response.getEntity(String.class));
 	}
 
 	@Override
-	public List<String> projectReference(String queryResponse) throws XPathExpressionException {
+	public Set<String> projectReference(String queryResponse) throws XPathExpressionException {
 		XmlParser responseDoc = new XmlParser(queryResponse);
 		String query;
 		if (this.projection.isEmpty()) {
@@ -123,12 +120,12 @@ public class RestQuery implements Query {
 			String idAttr = this.projection.iterator().next();
 			query = "//" + idAttr + "/@href";
 		}
-		List<String> results = responseDoc.query(query);
+		Set<String> results = new HashSet<>(responseDoc.query(query));
 		return results;
 	}
 
 	@Override
-	public List<String> projectContent(String queryResponse) throws XPathExpressionException {
+	public Set<String> projectContent(String queryResponse) throws XPathExpressionException {
 		XmlParser responseDoc = new XmlParser(queryResponse);
 		String query;
 		if (this.projection.isEmpty()) {
@@ -137,7 +134,7 @@ public class RestQuery implements Query {
 			String idAttr = this.projection.iterator().next();
 			query = "//" + idAttr + "/text()";
 		}
-		List<String> results = responseDoc.query(query);
+		Set<String> results = new HashSet<>(responseDoc.query(query));
 		return results;
 	}
 

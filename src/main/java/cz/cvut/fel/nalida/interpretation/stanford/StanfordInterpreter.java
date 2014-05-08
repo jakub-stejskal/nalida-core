@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 import cz.cvut.fel.nalida.Lexicon;
+import cz.cvut.fel.nalida.Main;
 import cz.cvut.fel.nalida.interpretation.Attachment;
 import cz.cvut.fel.nalida.interpretation.Interpretation;
 import cz.cvut.fel.nalida.interpretation.Interpreter;
@@ -43,8 +44,11 @@ public class StanfordInterpreter implements Interpreter<Annotation> {
 		List<Set<Token>> tokenSets = createTokenSets(annotatedLine, tokenIndices);
 		Set<List<Token>> tokenLists = Sets.cartesianProduct(tokenSets);
 		Set<Interpretation> interpretations = createInterpretations(annotatedLine, tokenLists, tokenIndices);
+		Set<Interpretation> validInterpretations = validateInterpretations(annotatedLine, interpretations);
 
-		return validateInterpretations(annotatedLine, interpretations);
+		Set<Interpretation> usedInterpretations = validInterpretations.isEmpty() ? interpretations : validInterpretations;
+		Set<Interpretation> simplestInterpretations = getSimplestInterpretations(usedInterpretations);
+		return simplestInterpretations;
 	}
 
 	private List<Set<Token>> createTokenSets(Annotation annotatedLine, Map<Integer, Integer> tokenIndices) {
@@ -164,8 +168,9 @@ public class StanfordInterpreter implements Interpreter<Annotation> {
 					if (token.equals(interpretation.getRoot())
 							|| attached.isType(ElementType.WH_WORD)
 							|| (attached.isType(ElementType.VALUE) && attached.getElement().equals(attribute.getValueElement()))
-							|| (attached.isType(ElementType.ENTITY, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE) && attached
-									.getElement().equals(attribute.getTypeEntity()))) {
+							|| (attached.isType(ElementType.ENTITY, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE) && (attached
+									.getEntityElement().equals(attribute.getTypeEntity()) || (attached.getEntityElement().equals(attribute
+									.toEntityElement()))))) {
 						valid = true;
 						break;
 					}
@@ -174,8 +179,10 @@ public class StanfordInterpreter implements Interpreter<Annotation> {
 				valid = true;
 			}
 			if (!valid) {
-				System.out.println("INTERPRETATION : " + interpretation);
-				System.out.println("FAILED TOKEN: " + token + " --- " + interpretation.getAttached(token));
+				if (Main.PRINT_FILTERING) {
+					System.out.println("INTERPRETATION : " + interpretation);
+					System.out.println("FAILED TOKEN: " + token + " --- " + interpretation.getAttached(token));
+				}
 				return false;
 			}
 		}
@@ -189,8 +196,10 @@ public class StanfordInterpreter implements Interpreter<Annotation> {
 			if (!source.isType(ElementType.WH_WORD) && !target.isType(ElementType.WH_WORD)
 					&& !source.getEntityElement().equals(target.getEntityElement()) && !isAttributeOfType(source, target)
 					&& !isAttributeOfType(target, source)) {
-				System.out.println("INTERPRETATION : " + interpretation);
-				System.out.println("FAILED ATTACH: " + attachment);
+				if (Main.PRINT_FILTERING) {
+					System.out.println("INTERPRETATION : " + interpretation);
+					System.out.println("FAILED ATTACH: " + attachment);
+				}
 				return false;
 			}
 		}
@@ -206,5 +215,19 @@ public class StanfordInterpreter implements Interpreter<Annotation> {
 			}
 		}
 		return false;
+	}
+
+	private Set<Interpretation> getSimplestInterpretations(Set<Interpretation> validInterpretations) {
+		int minimalEntityCount = Integer.MAX_VALUE;
+		for (Interpretation interpretation : validInterpretations) {
+			minimalEntityCount = Math.min(minimalEntityCount, interpretation.getEntityCount());
+		}
+		Set<Interpretation> simplestInterpretations = new HashSet<>();
+		for (Interpretation interpretation : validInterpretations) {
+			if (interpretation.getEntityCount() == minimalEntityCount) {
+				simplestInterpretations.add(interpretation);
+			}
+		}
+		return simplestInterpretations;
 	}
 }

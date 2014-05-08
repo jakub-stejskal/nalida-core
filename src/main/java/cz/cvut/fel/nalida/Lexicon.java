@@ -59,7 +59,7 @@ public class Lexicon {
 
 	private void loadValues(String schemaPath, Entity entity, Attribute attribute) throws IOException {
 		if (attribute.isPrimitiveType()) {
-			String valueFilename = format("%s%s.%s.values", schemaPath, entity.getName(), attribute.getName());
+			String valueFilename = format("%s%s.%s.values", schemaPath, entity.getName(), attribute.getName().replace('/', '-'));
 
 			BufferedReader br = new BufferedReader(new FileReader(valueFilename));
 			String line;

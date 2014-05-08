@@ -20,6 +20,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
+import cz.cvut.fel.nalida.NalidaError;
 import cz.cvut.fel.nalida.interpretation.Interpretation;
 import cz.cvut.fel.nalida.interpretation.Token;
 import cz.cvut.fel.nalida.schema.Element;
@@ -78,10 +79,9 @@ abstract public class QueryGenerator {
 	protected Set<Element> getProjectionElements(Interpretation interpretation) {
 
 		Collection<Token> whWordTokens = interpretation.getTokens(ElementType.WH_WORD);
-		if (whWordTokens.isEmpty()) {
+		if (whWordTokens.isEmpty() && interpretation.getRoot() != null) {
 			return Sets.newHashSet(interpretation.getRoot().getElement());
-		} else {
-
+		} else if (!whWordTokens.isEmpty()) {
 			Set<Element> elements = new HashSet<>();
 			for (Token whToken : interpretation.getTokens(ElementType.WH_WORD)) {
 				for (Token token : interpretation.getAttached(whToken)) {
@@ -90,7 +90,14 @@ abstract public class QueryGenerator {
 					}
 				}
 			}
+			if (elements.isEmpty()) {
+				throw new NalidaError("No projection words found");
+			}
 			return elements;
+		} else if (interpretation.getElements(ElementType.ENTITY, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE).size() == 1) {
+			return new HashSet<>(interpretation.getElements(ElementType.ENTITY, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE));
+		} else {
+			throw new NalidaError("No projection words found");
 		}
 	}
 
@@ -120,7 +127,6 @@ abstract public class QueryGenerator {
 		if (resultEntities.size() > 1) {
 			throw new UnsupportedOperationException("Multi-entity projections not supported.");
 		}
-
 		return resultEntities.iterator().next();
 	}
 
@@ -141,9 +147,9 @@ abstract public class QueryGenerator {
 		ElementGraph graph = new ElementGraph(this.schema.getGraph(), interpretation.getElements(), getEntityElements(interpretation));
 		FloydWarshallShortestPaths<Element, DefaultWeightedEdge> shortestPaths = new FloydWarshallShortestPaths<>(graph);
 		List<Entity> bestOrdering = getBestConstraintEntitiesOrdering(graph, shortestPaths, projEntity, constraintEntities);
-		System.out.println("ORDER: \n " + bestOrdering);
 		List<DefaultWeightedEdge> shortestPath = getPathThroughOrdering(shortestPaths, projEntity, bestOrdering);
-		System.out.println("PATH: \n " + shortestPath);
+		//		System.out.println("ORDER: \n " + bestOrdering);
+		//		System.out.println("PATH: \n " + shortestPath);
 		return shortestPath;
 
 	}

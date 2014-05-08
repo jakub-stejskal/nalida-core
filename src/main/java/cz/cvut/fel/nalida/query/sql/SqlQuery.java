@@ -1,10 +1,9 @@
 package cz.cvut.fel.nalida.query.sql;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import javax.xml.xpath.XPathExpressionException;
 
 import com.google.common.base.Joiner;
 
@@ -48,7 +47,7 @@ public class SqlQuery implements Query {
 	}
 
 	@Override
-	public String execute(List<String> ids) throws Exception {
+	public String execute(Set<String> ids) throws Exception {
 		List<String> responses = new ArrayList<>();
 		if (ids.isEmpty()) {
 			responses.add(execute(""));
@@ -61,19 +60,17 @@ public class SqlQuery implements Query {
 	}
 
 	private String execute(String id) throws Exception {
-		return null;
+		return toString();
 	}
 
 	@Override
-	public List<String> projectReference(String queryResponse) throws XPathExpressionException {
-		// TODO Auto-generated method stub
-		return null;
+	public Set<String> projectReference(String queryResponse) {
+		return Collections.emptySet();
 	}
 
 	@Override
-	public List<String> projectContent(String queryResponse) throws XPathExpressionException {
-		// TODO Auto-generated method stub
-		return null;
+	public Set<String> projectContent(String queryResponse) {
+		return Collections.emptySet();
 	}
 
 	@Override
