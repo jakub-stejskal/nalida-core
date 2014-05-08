@@ -31,6 +31,7 @@ import cz.cvut.fel.nalida.query.rest.RestQueryGenerator;
 import cz.cvut.fel.nalida.query.sql.SqlQueryGenerator;
 import cz.cvut.fel.nalida.schema.Schema;
 import cz.cvut.fel.nalida.syntax.stanford.SemanticAnnotator;
+import cz.cvut.fel.nalida.syntax.stanford.StanfordLemmatizer;
 import cz.cvut.fel.nalida.syntax.stanford.SyntacticAnalysis;
 import cz.cvut.fel.nalida.util.GraphDisplay;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
@@ -157,7 +158,7 @@ public class Main {
 	private static void initializeModules() throws IOException {
 		InputStream input = new FileInputStream(new File(DATA_PATH + SCHEMA_FILENAME));
 		schema = Schema.load(input);
-		lexicon = new Lexicon(schema, DATA_PATH);
+		lexicon = new Lexicon(new StanfordLemmatizer(), schema, DATA_PATH);
 		if (cli.hasOption("graph")) {
 			GraphDisplay.displayGraph(schema.getGraph());
 		}

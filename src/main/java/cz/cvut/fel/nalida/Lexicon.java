@@ -18,18 +18,16 @@ import cz.cvut.fel.nalida.schema.Attribute;
 import cz.cvut.fel.nalida.schema.Element;
 import cz.cvut.fel.nalida.schema.Entity;
 import cz.cvut.fel.nalida.schema.Schema;
-import cz.cvut.fel.nalida.syntax.stanford.Lemmatizer;
+import cz.cvut.fel.nalida.syntax.Lemmatizer;
 
 public class Lexicon {
 
 	Map<String, Set<Token>> lexicon;
-	Map<String, Element> elements;
 	Lemmatizer lemmatizer;
 
-	public Lexicon(Schema schema, String valuesPath) throws IOException {
+	public Lexicon(Lemmatizer lemmatizer, Schema schema, String valuesPath) throws IOException {
 		this.lexicon = new HashMap<>();
-		this.elements = new HashMap<>();
-		this.lemmatizer = new Lemmatizer();
+		this.lemmatizer = lemmatizer;
 		loadLexicon(schema, valuesPath);
 	}
 

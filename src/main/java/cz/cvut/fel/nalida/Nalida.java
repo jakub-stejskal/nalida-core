@@ -14,6 +14,7 @@ import cz.cvut.fel.nalida.query.QueryPlan;
 import cz.cvut.fel.nalida.query.rest.RestQueryGenerator;
 import cz.cvut.fel.nalida.query.sql.SqlQueryGenerator;
 import cz.cvut.fel.nalida.schema.Schema;
+import cz.cvut.fel.nalida.syntax.stanford.StanfordLemmatizer;
 import cz.cvut.fel.nalida.syntax.stanford.SyntacticAnalysis;
 import edu.stanford.nlp.pipeline.Annotation;
 
@@ -34,7 +35,7 @@ public class Nalida {
 
 		InputStream input = new FileInputStream(new File(schemaPath));
 		this.schema = Schema.load(input);
-		Lexicon lexicon = new Lexicon(this.schema, valuesPath);
+		Lexicon lexicon = new Lexicon(new StanfordLemmatizer(), this.schema, valuesPath);
 
 		this.syntacticAnalysis = new SyntacticAnalysis(lexicon);
 		this.tokenizer = new StanfordInterpreter(lexicon);
