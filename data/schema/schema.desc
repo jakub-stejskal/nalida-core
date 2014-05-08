@@ -8,12 +8,15 @@ entities:
       - name:   username
         type:   string
         tokens: [username]
+      - name:   email
+        type:   string
+        tokens: [email]
       - name:   firstName
         type:   string
-        tokens: [name, first name]
+        tokens: [first name]
       - name:   lastName
         type:   string
-        tokens: [name, last name, surname]
+        tokens: [name, surname]
       - name:   phone
         type:   string
         tokens: [phone, phone number]
@@ -21,12 +24,12 @@ entities:
         type:   Division
         tokens: [division, department, work, employ]
       - name:   supervisionPhDStudents
-        type:   string
+        type:   enum
         tokens: [supervision]
     subresources:
       - name:   courses
         type:   Course
-        tokens: [teach, course]
+        tokens: [teach]
 
   - name: Course
     resource: courses/

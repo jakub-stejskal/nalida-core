@@ -59,10 +59,10 @@ entities:
     subresources:
       - name:   exams
         type:   Exam
-        tokens: [exam]
+        tokens: [examine]
       - name:   parallels
         type:   Parallel
-        tokens: [teach]
+        tokens: [parallel]
       - name:   students
         type:   Student
         tokens: [attend]
@@ -97,7 +97,7 @@ entities:
         tokens: [capacity]
       - name:   course
         type:   Course
-        tokens: [course]
+        tokens: [examine]
       - name:   department
         type:   Division
         tokens: [department]
@@ -130,7 +130,7 @@ entities:
         tokens: [type]
       - name:   course
         type:   Course
-        tokens: [course]
+        tokens: []
       - name:   teachers/teacher
         type:   Teacher*
         tokens: [teacher, teach]
