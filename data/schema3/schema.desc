@@ -82,7 +82,7 @@ entities:
         tokens: [capacity]
       - name:   instance/occupied
         type:   integer
-        tokens: [number student]
+        tokens: [number student, number occupied]
     subresources:
       - name:   exams
         type:   Exam
@@ -136,17 +136,14 @@ entities:
         tokens: [start, date]
       - name:   occupied
         type:   string
-        tokens: [occupy]
-      - name:   room
-        type:   Room
-        tokens: []
+        tokens: [occupied]
       - name:   room
         type:   Room
         tokens: []
     subresources:
       - name:   attendees
         type:   Student
-        tokens: [sit, take]
+        tokens: [sit, take, attendee]
 
   - name: Parallel
     resource: parallels/
@@ -157,7 +154,7 @@ entities:
         tokens: [capacity]
       - name:   occupied
         type:   integer
-        tokens: [occupy]
+        tokens: [occupied]
       - name:   code
         type:   integer
         tokens: [code]
@@ -173,6 +170,15 @@ entities:
       - name:   timetableSlot/room
         type:   Room*
         tokens: []
+      - name:   timetableSlot/firstHour
+        type:   integer
+        tokens: [hour, start time, start]
+      - name:   timetableSlot/day
+        type:   integer
+        tokens: [day]
+      - name:   timetableSlot/duration
+        type:   integer
+        tokens: [duration]
     subresources:
       - name:   related
         type:   Parallel
@@ -200,9 +206,6 @@ entities:
       - name:   lastName
         type:   string
         tokens: [name, surname]
-      - name:   department
-        type:   Division
-        tokens: []
       - name:   faculty
         type:   Division
         tokens: [faculty]
@@ -250,7 +253,7 @@ entities:
       - name:   capacity
         type:   integer
         tokens: [capacity]
-      - name:   division
+      - name:   department
         type:   Division
         tokens: []
       - name:   type
@@ -270,9 +273,6 @@ entities:
       - name:   capacity
         type:   integer
         tokens: [capacity]
-      - name:   division
-        type:   Division
-        tokens: []
       - name:   type
         type:   enum
         tokens: [type]
@@ -338,3 +338,17 @@ entities:
       - name:   roles/teacher
         type:   Teacher
         tokens: []
+
+  - name: Semester
+    resource: semesters/
+    tokens: [semester]
+    attributes:
+      - name:   name
+        type:   string
+        tokens: [name]
+      - name:   startDate
+        type:   string
+        tokens: [start]
+      - name:   endDate
+        type:   string
+        tokens: [end]
