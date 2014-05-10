@@ -136,45 +136,51 @@ public class Main {
 		double startTime = System.currentTimeMillis();
 		Set<Interpretation> interpretations = interpreter.interpret(annotatedLine);
 		double interpretationTime = System.currentTimeMillis();
-		if (cli.hasOption("verbose")) {
-			System.out.println("TIME-INT:" + (interpretationTime - startTime));
-		}
 		Interpretation interpretation = pickInterpretation(interpretations);
 		double pickTime = System.currentTimeMillis();
-		printSyntacticInfo(annotatedLine);
+		QueryPlan queryPlan = null;
+		double queryGenTime = 0, endPlanTime = 0;
 		if (interpretation == null) {
 			System.out.println("Failed to translate query:" + line);
 			if (cli.hasOption("verbose")) {
 				printSyntacticInfo(annotatedLine);
 			}
-			return;
-		}
-		if (cli.hasOption("verbose")) {
-			System.out.println("Selected interpretation: ");
-			System.out.println(interpretation);
-		}
-		QueryPlan queryPlan = queryGenerator.generateQuery(interpretation);
-		double queryGenTime = System.currentTimeMillis();
-		if (cli.hasOption("verbose")) {
-			System.out.println("TIME-QPG:" + (queryGenTime - pickTime));
-		}
-		if (cli.hasOption("verbose") || cli.hasOption("dry-run")) {
-			System.out.println("Generated query:");
-			System.out.println(queryPlan);
-			System.out.println();
-		}
-		if (!cli.hasOption("dry-run")) {
-			try {
-				System.out.println(queryPlan.execute());
-			} catch (Exception e) {
-				System.out.println("Failed to execute the query plan: " + e.getMessage());
+		} else {
+			if (cli.hasOption("verbose")) {
+				System.out.println("Selected interpretation: ");
+				System.out.println(interpretation);
 			}
+			queryPlan = queryGenerator.generateQuery(interpretation);
+			queryGenTime = System.currentTimeMillis();
+			if (cli.hasOption("verbose") || cli.hasOption("dry-run")) {
+				System.out.println("Generated query:");
+				System.out.println(queryPlan);
+				System.out.println();
+			}
+			if (!cli.hasOption("dry-run")) {
+				try {
+					System.out.println(queryPlan.execute());
+				} catch (Exception e) {
+					System.out.println("Failed to execute the query plan: " + e.getMessage());
+				}
+			}
+			endPlanTime = System.currentTimeMillis();
 		}
-		double endPlanTime = System.currentTimeMillis();
+
 		if (cli.hasOption("verbose")) {
+
+			System.out.println("INPUT:" + line);
+			System.out.println("INT#    :" + interpretations.size());
+			System.out.println("INT-SIZE:" + ((interpretation != null) ? interpretation.getEntityCount() : 0));
+			System.out.println("QP-LEN  :" + (queryPlan != null ? Integer.valueOf(queryPlan.getLenght()) : "-"));
+			System.out.println();
+			System.out.println("TIME-INT:" + (interpretationTime - startTime));
+			double qpgDuration = (queryGenTime > pickTime ? (queryGenTime - pickTime) : 0);
+			System.out.println("TIME-QPG:" + qpgDuration);
 			System.out.println("TIME-EXE:" + (endPlanTime - queryGenTime));
-			System.out.println("TIME-CMP:" + ((interpretationTime - startTime) + (queryGenTime - pickTime)));
-			System.out.println("TIME-TOT:" + ((interpretationTime - startTime) + (queryGenTime - pickTime) + (endPlanTime - queryGenTime)));
+			System.out.println();
+			System.out.println("TIME-CMP:" + ((interpretationTime - startTime) + qpgDuration));
+			System.out.println("TIME-TOT:" + ((interpretationTime - startTime) + qpgDuration + (endPlanTime - queryGenTime)));
 		}
 	}
 
@@ -200,9 +206,6 @@ public class Main {
 	}
 
 	private static Interpretation pickInterpretation(Set<Interpretation> interpretations) throws IOException {
-		if (cli.hasOption("verbose")) {
-			System.out.println("INT#:" + interpretations.size());
-		}
 		if (interpretations.size() == 1) {
 			Interpretation interpretation = interpretations.iterator().next();
 			if (interpretation.getElements().isEmpty()) {

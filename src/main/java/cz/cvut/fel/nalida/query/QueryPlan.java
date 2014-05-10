@@ -8,7 +8,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 
 public class QueryPlan {
-	List<Query> queries = new ArrayList<>();
+	protected List<Query> queries = new ArrayList<>();
 
 	public void addQuery(Query query) {
 		this.queries.add(query);
@@ -25,6 +25,10 @@ public class QueryPlan {
 			queryParams = query.projectReference(queryResponse);
 		}
 		return queryResponse;
+	}
+
+	public int getLenght() {
+		return this.queries.size();
 	}
 
 	@Override
