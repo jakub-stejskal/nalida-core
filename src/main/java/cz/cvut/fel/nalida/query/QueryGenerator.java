@@ -90,11 +90,11 @@ abstract public class QueryGenerator {
 					}
 				}
 			}
-			if (elements.isEmpty()) {
-				throw new NalidaError("No projection words found");
+			if (!elements.isEmpty()) {
+				return elements;
 			}
-			return elements;
-		} else if (interpretation.getElements(ElementType.ENTITY, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE).size() == 1) {
+		}
+		if (interpretation.getEntityCount(ElementType.ENTITY, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE) == 1) {
 			return new HashSet<>(interpretation.getElements(ElementType.ENTITY, ElementType.ATTRIBUTE, ElementType.SUBRESOURCE));
 		} else {
 			throw new NalidaError("No projection words found");

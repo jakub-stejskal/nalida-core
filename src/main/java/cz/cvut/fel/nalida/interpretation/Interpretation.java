@@ -78,6 +78,22 @@ public class Interpretation {
 		return entities.size();
 	}
 
+	public int getEntityCount(ElementType... types) {
+		Set<Entity> entities = new HashSet<>();
+		for (Token token : getTokens()) {
+			if (token.isType(types)) {
+				if (!token.isType(ElementType.WH_WORD)) {
+					entities.add(token.getEntityElement());
+				}
+				if (token.isType(ElementType.SUBRESOURCE)
+						|| (token.isType(ElementType.ATTRIBUTE) && !((Attribute) token.getElement()).isPrimitiveType())) {
+					entities.add(((Attribute) token.getElement()).getTypeEntity());
+				}
+			}
+		}
+		return entities.size();
+	}
+
 	public List<Element> getElements(final ElementType... type) {
 		List<Element> elements = new ArrayList<>();
 		for (Token token : getTokens(type)) {
