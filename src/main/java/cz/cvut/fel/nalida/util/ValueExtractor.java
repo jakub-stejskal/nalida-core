@@ -83,13 +83,22 @@ public class ValueExtractor {
 	}
 
 	public static void main(String[] args) throws Exception {
+		String inputPath = "data/schema/schema.desc";
+		String outputPath = "data/extracted/";
 
-		InputStream input = new FileInputStream(new File("data/schema/schema.desc"));
+		if (args.length < 0) {
+			inputPath = args[0];
+		}
+		if (args.length < 1) {
+			outputPath = args[1];
+		}
+
+		InputStream input = new FileInputStream(new File(inputPath));
 		Schema s = Schema.load(input);
 		Properties props = new Properties();
 		props.load(Main.class.getClassLoader().getResourceAsStream("db.properties"));
 		props.put("baseUrl", s.getBaseUri());
-		ValueExtractor extractor = new ValueExtractor(s, "data/extracted/", props);
+		ValueExtractor extractor = new ValueExtractor(s, outputPath, props);
 		extractor.extractAll();
 	}
 }
