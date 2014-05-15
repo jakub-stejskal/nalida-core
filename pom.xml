@@ -99,7 +99,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>cz.cvut.fel.nlidb4kos.Main</mainClass>
+							<mainClass>cz.cvut.fel.nalida.Main</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

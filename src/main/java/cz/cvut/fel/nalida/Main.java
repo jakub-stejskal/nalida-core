@@ -47,7 +47,7 @@ import edu.stanford.nlp.util.CoreMap;
 public class Main {
 
 	private static final String QUERIES_FILE = "data/dev.txt";
-	private static final String DATA_PATH = "data/schema3/";
+	private static final String DATA_PATH = "data/schema/";
 	private static final String SCHEMA_FILENAME = "schema.desc";
 	public static boolean PRINT_FILTERING = false;
 	static Scanner in = new Scanner(System.in);

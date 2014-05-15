@@ -20,7 +20,7 @@ import edu.stanford.nlp.pipeline.Annotation;
 
 public class Nalida {
 
-	private static final String SCHEMA_PATH = "data/schema2/";
+	private static final String SCHEMA_PATH = "data/schema/";
 	private final Schema schema;
 	private final SyntacticAnalysis syntacticAnalysis;
 	private final Interpreter<Annotation> tokenizer;

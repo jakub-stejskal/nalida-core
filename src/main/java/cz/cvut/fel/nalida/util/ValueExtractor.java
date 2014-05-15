@@ -50,8 +50,8 @@ public class ValueExtractor {
 	}
 
 	private boolean performQuery(Entity entity, int offset) {
-		Query query = new RestQueryBuilder(this.props).resource(entity.getResource()).projection("content").offset(offset).limit(this.limit)
-				.build();
+		Query query = new RestQueryBuilder(this.props).resource(entity.getResource()).projection("content").offset(offset)
+				.limit(this.limit).build();
 
 		try {
 			String result = query.execute();
@@ -86,10 +86,10 @@ public class ValueExtractor {
 		String inputPath = "data/schema/schema.desc";
 		String outputPath = "data/extracted/";
 
-		if (args.length < 0) {
+		if (args.length > 0) {
 			inputPath = args[0];
 		}
-		if (args.length < 1) {
+		if (args.length > 1) {
 			outputPath = args[1];
 		}
 
